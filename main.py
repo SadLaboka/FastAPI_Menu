@@ -27,6 +27,7 @@ def root():
 
 @app.on_event("startup")
 async def startup():
+    """Connects to db"""
     app.database = Database()
     await app.database.connect()
 

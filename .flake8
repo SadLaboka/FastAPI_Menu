@@ -1,7 +1,8 @@
 [flake8]
 exclude = venv,
     git,
-    src/migrations
+    src/migrations,
+    */__init__.py
 
 
 max-line-length = 120

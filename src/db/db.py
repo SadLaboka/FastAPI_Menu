@@ -11,11 +11,9 @@ db_base = declarative_base()
 class Database:
     def __init__(self):
         self._engine: Optional[AsyncEngine] = None
-        self._db: Optional[declarative_base] = None
         self.session: Optional[AsyncSession] = None
 
     async def connect(self, *_: list, **__: dict) -> None:
-        self._db = db_base
         self._engine = create_async_engine(
             config.DATABASE_URL,
             echo=True,
