@@ -4,8 +4,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.v1.schemas import MenuCreate, MenuResponse, MenuUpdate
-from src.api.v1.schemas.menus import (SubMenuCreate, SubMenuResponse,
-                                      SubMenuUpdate)
+from src.api.v1.schemas.menus import (DishCreate, DishResponse, SubMenuCreate,
+                                      SubMenuResponse, SubMenuUpdate, DishUpdate)
 from src.services import MenuService, get_menu_service
 
 router = APIRouter()
@@ -93,7 +93,7 @@ async def submenu_list(
         menu_id: str,
         service: MenuService = Depends(get_menu_service)
 ) -> list:
-    submenus = await service.get_submenus(menu_id=menu_id)
+    submenus: list = await service.get_submenus(menu_id=menu_id)
     return submenus
 
 
@@ -107,7 +107,7 @@ async def submenu_detail(
         submenu_id: str,
         service: MenuService = Depends(get_menu_service)
 ) -> SubMenuResponse:
-    submenu: dict = await service.get_submenu(submenu_id=submenu_id)
+    submenu: Optional[dict] = await service.get_submenu(submenu_id=submenu_id)
     if not submenu:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
     return SubMenuResponse(**submenu)
@@ -125,7 +125,7 @@ async def submenu_create(
         submenu: SubMenuCreate,
         service: MenuService = Depends(get_menu_service)
 ) -> SubMenuResponse:
-    submenu: dict = await service.create_submenu(menu_id=menu_id, submenu=submenu)
+    submenu: Optional[dict] = await service.create_submenu(menu_id=menu_id, submenu=submenu)
     if not submenu:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="menu not found")
     return SubMenuResponse(**submenu)
@@ -142,7 +142,7 @@ async def submenu_update(
         new_data: SubMenuUpdate,
         service: MenuService = Depends(get_menu_service)
 ) -> SubMenuResponse:
-    submenu = await service.update_submenu(submenu_id=submenu_id, new_data=new_data)
+    submenu: Optional[dict] = await service.update_submenu(submenu_id=submenu_id, new_data=new_data)
     if not submenu:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
     return SubMenuResponse(**submenu)
@@ -161,3 +161,82 @@ async def submenu_delete(
     if not result:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
     return {"status": True, "message": "The submenu has been deleted"}
+
+
+@router.get(
+    path="/{menu_id}/submenus/{submenu_id}/dishes",
+    summary="Get dishes list",
+    tags=["menus"]
+)
+async def dish_list(
+        submenu_id: str,
+        service: MenuService = Depends(get_menu_service)
+) -> list:
+    dishes: list = await service.get_dishes(submenu_id)
+    return dishes
+
+
+@router.get(
+    path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+    response_model=DishResponse,
+    summary="Get a specific dish",
+    tags=["menus"]
+)
+async def dish_detail(
+        dish_id: str,
+        service: MenuService = Depends(get_menu_service)
+) -> DishResponse:
+    dish: Optional[dict] = await service.get_dish(dish_id)
+    if not dish:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
+    return DishResponse(**dish)
+
+
+@router.patch(
+    path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+    response_model=DishResponse,
+    summary="Get dishes list",
+    tags=["menus"]
+)
+async def dish_update(
+        dish_id: str,
+        new_data: DishUpdate,
+        service: MenuService = Depends(get_menu_service)
+) -> DishResponse:
+    dish: Optional[dict] = await service.update_dish(dish_id, new_data)
+    if not dish:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
+    return DishResponse(**dish)
+
+
+@router.post(
+    path="/{menu_id}/submenus/{submenu_id}/dishes",
+    response_model=DishResponse,
+    status_code=HTTPStatus.CREATED,
+    summary="Create a dish",
+    tags=["menus"]
+)
+async def dish_create(
+        submenu_id: str,
+        dish: DishCreate,
+        service: MenuService = Depends(get_menu_service)
+) -> DishResponse:
+    dish: Optional[dict] = await service.create_dish(submenu_id, dish)
+    if not dish:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
+    return DishResponse(**dish)
+
+
+@router.delete(
+    path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
+    summary="Delete a dish",
+    tags=["menus"]
+)
+async def dish_delete(
+        dish_id: str,
+        service: MenuService = Depends(get_menu_service)
+) -> dict:
+    result: bool = await service.delete_dish(dish_id)
+    if not result:
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
+    return {"status": True, "message": "The dish has been deleted"}

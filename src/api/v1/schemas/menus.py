@@ -1,8 +1,12 @@
+import re
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, validator
 
 __all__ = (
+    "DishResponse",
+    "DishCreate",
+    "DishUpdate",
     "MenuResponse",
     "MenuCreate",
     "MenuUpdate",
@@ -12,9 +16,35 @@ __all__ = (
 )
 
 
+class DishBase(BaseModel):
+    title: str = Field(max_length=60)
+    description: str = Field(max_length=200)
+    price: str
+
+    @validator("price")
+    def check_price(cls, v):
+        pattern = r"[+-]?([0-9]*[.])?[0-9]+"
+
+        if not re.match(pattern, v):
+            raise ValueError('Uncorrect price')
+        return v
+
+
+class DishResponse(DishBase):
+    id: UUID
+
+
+class DishCreate(DishBase):
+    ...
+
+
+class DishUpdate(DishBase):
+    ...
+
+
 class MenuBase(BaseModel):
-    title: str
-    description: str
+    title: str = Field(max_length=60)
+    description: str = Field(max_length=200)
 
 
 class MenuResponse(MenuBase):
@@ -32,8 +62,8 @@ class MenuUpdate(MenuBase):
 
 
 class SubMenuBase(BaseModel):
-    title: str
-    description: str
+    title: str = Field(max_length=60)
+    description: str = Field(max_length=200)
 
 
 class SubMenuResponse(SubMenuBase):

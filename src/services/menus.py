@@ -4,10 +4,10 @@ from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.accessors import MenuAccessor
-from src.api.v1.schemas import (MenuCreate, MenuUpdate, SubMenuCreate,
-                                SubMenuUpdate)
+from src.api.v1.schemas import (DishCreate, DishUpdate, MenuCreate, MenuUpdate,
+                                SubMenuCreate, SubMenuUpdate)
 from src.db import get_session
-from src.models import MenuModel, SubMenuModel
+from src.models import DishModel, MenuModel, SubMenuModel
 from src.services.mixins import ServiceMixin
 
 
@@ -61,16 +61,16 @@ class MenuService(ServiceMixin):
             answer = await self.make_menu_answer(menu)
             return answer
 
-    async def create_submenu(self, menu_id: str, submenu: SubMenuCreate) -> dict:
+    async def create_submenu(self, menu_id: str, submenu: SubMenuCreate) -> Optional[dict]:
         """Creates a new submenu."""
         async with self.session as db_session:
             async with db_session.begin():
                 menu_accessor = MenuAccessor(db_session)
                 submenu = await menu_accessor.create_submenu(
                     menu_id=menu_id, title=submenu.title, description=submenu.description)
-
-        answer = await self.make_submenu_answer(submenu)
-        return answer
+        if submenu:
+            answer = await self.make_submenu_answer(submenu)
+            return answer
 
     async def delete_submenu(self, submenu_id: str) -> bool:
         """Deletes submenu by given id."""
@@ -101,7 +101,7 @@ class MenuService(ServiceMixin):
         return [await self.make_submenu_answer(submenu) for submenu in submenus]
 
     async def update_submenu(self, submenu_id: str, new_data: SubMenuUpdate) -> Optional[dict]:
-        """Updates a new submenu."""
+        """Updates a submenu for a given id."""
         async with self.session as db_session:
             async with db_session.begin():
                 menu_accessor = MenuAccessor(db_session)
@@ -111,28 +111,90 @@ class MenuService(ServiceMixin):
             answer = await self.make_submenu_answer(submenu)
             return answer
 
+    async def create_dish(self, submenu_id: str, dish: DishCreate) -> Optional[dict]:
+        """Creates a new dish."""
+        async with self.session as db_session:
+            async with db_session.begin():
+                menu_accessor = MenuAccessor(db_session)
+                dish = await menu_accessor.create_dish(
+                    submenu_id=submenu_id, title=dish.title, description=dish.description, price=dish.price
+                )
+
+        if dish:
+            answer = await self.make_dish_answer(dish)
+            return answer
+
+    async def delete_dish(self, dish_id: str) -> bool:
+        """Deletes dish by given id."""
+        async with self.session as db_session:
+            async with db_session.begin():
+                menu_accessor = MenuAccessor(db_session)
+                result = await menu_accessor.delete_dish_by_id(dish_id=dish_id)
+
+        return result
+
+    async def get_dish(self, dish_id: str) -> Optional[dict]:
+        """Gets a dish for a given id."""
+        async with self.session as db_session:
+            async with db_session.begin():
+                menu_accessor = MenuAccessor(db_session)
+                dish = await menu_accessor.get_dish_by_id(dish_id=dish_id)
+
+        if dish:
+            answer = await self.make_dish_answer(dish)
+            return answer
+
+    async def get_dishes(self, submenu_id: str) -> List[dict]:
+        """Gets a dish list"""
+        async with self.session as db_session:
+            async with db_session.begin():
+                menu_accessor = MenuAccessor(db_session)
+                dishes = await menu_accessor.get_dishes(submenu_id=submenu_id)
+
+        return [await self.make_dish_answer(dish) for dish in dishes]
+
+    async def update_dish(self, dish_id: str, new_data: DishUpdate) -> Optional[dict]:
+        """Updates a dish for a given id."""
+        async with self.session as db_session:
+            async with db_session.begin():
+                menu_accessor = MenuAccessor(db_session)
+                dish = await menu_accessor.update_dish(dish_id=dish_id, title=new_data.title,
+                                                       description=new_data.description, price=new_data.price)
+
+            if dish:
+                answer = await self.make_dish_answer(dish)
+                return answer
+
+    @staticmethod
+    async def make_dish_answer(dish: DishModel) -> dict:
+        """Converts an object to the desired format"""
+        return {
+            'id': dish.id,
+            'title': dish.title,
+            'description': dish.description,
+            'price': str(dish.price)
+        }
+
     @staticmethod
     async def make_menu_answer(menu: MenuModel) -> dict:
         """Converts an object to the desired format"""
-        answer = {
+        return {
             'id': menu.id,
             'title': menu.title,
             'description': menu.description,
             'submenus_count': len(menu.submenus),
             'dishes_count': sum([len(submenu.dishes) for submenu in menu.submenus]) if menu.submenus else 0,
         }
-        return answer
 
     @staticmethod
     async def make_submenu_answer(submenu: SubMenuModel) -> dict:
         """Converts an object to the desired format"""
-        answer = {
+        return {
             'id': submenu.id,
             'title': submenu.title,
             'description': submenu.description,
             'dishes_count': len(submenu.dishes)
         }
-        return answer
 
 
 async def get_menu_service(

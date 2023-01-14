@@ -4,7 +4,7 @@ from sqlalchemy import select, update
 from sqlalchemy.orm import joinedload
 
 from src.accessors import BaseAccessor
-from src.models import MenuModel, SubMenuModel
+from src.models import DishModel, MenuModel, SubMenuModel
 
 
 class MenuAccessor(BaseAccessor):
@@ -66,6 +66,7 @@ class MenuAccessor(BaseAccessor):
     async def get_submenus(self, menu_id: str) -> List[SubMenuModel]:
         submenus = await self.session.scalars(
             select(SubMenuModel)
+            .where(SubMenuModel.menu_id == menu_id)
             .options(joinedload(SubMenuModel.dishes)))
 
         return [submenu for submenu in submenus.unique()]
@@ -84,6 +85,44 @@ class MenuAccessor(BaseAccessor):
         submenu = await self.get_submenu_by_id(id_)
         if submenu:
             await self.session.delete(submenu)
+            await self.session.commit()
+            return True
+        return False
+
+    async def create_dish(self, submenu_id: str, title: str, description: str, price: str) -> DishModel:
+        dish = DishModel(submenu_id=submenu_id, title=title, description=description, price=float(price))
+        self.session.add(dish)
+        await self.session.flush()
+        return dish
+
+    async def get_dish_by_id(self, dish_id: str) -> Optional[DishModel]:
+        dish = (await self.session.scalars(
+            select(DishModel)
+            .where(DishModel.id == dish_id))).first()
+        return dish if dish else None
+
+    async def get_dishes(self, submenu_id: str) -> List[DishModel]:
+        dishes = (await self.session.scalars(
+            select(DishModel)
+            .where(DishModel.submenu_id == submenu_id)
+        ))
+        return [dish for dish in dishes.unique()]
+
+    async def update_dish(self, dish_id: str, title: str, description: str, price: str) -> Optional[DishModel]:
+        await self.session.execute(update(DishModel).where(
+            DishModel.id == dish_id
+        ).values(
+            title=title,
+            description=description,
+            price=float(price)
+        ))
+        updated_dish = await self.get_dish_by_id(dish_id)
+        return updated_dish
+
+    async def delete_dish_by_id(self, dish_id: str) -> bool:
+        dish = await self.get_dish_by_id(dish_id)
+        if dish:
+            await self.session.delete(dish)
             await self.session.commit()
             return True
         return False

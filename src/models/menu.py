@@ -32,7 +32,12 @@ class SubMenuModel(db_base):
         ForeignKey("menu.id", ondelete="CASCADE"), nullable=False
     )
     menu = relationship("MenuModel", back_populates="submenus")
-    dishes = relationship("DishModel", back_populates="submenu")
+    dishes = relationship(
+        "DishModel",
+        back_populates="submenu",
+        cascade="all, delete",
+        passive_deletes=True
+    )
 
 
 class DishModel(db_base):
