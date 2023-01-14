@@ -195,7 +195,7 @@ async def dish_detail(
 @router.patch(
     path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     response_model=DishResponse,
-    summary="Get dishes list",
+    summary="Update a dish",
     tags=["menus"]
 )
 async def dish_update(
