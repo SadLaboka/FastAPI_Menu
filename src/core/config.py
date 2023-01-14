@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PROJECT_NAME: str = os.getenv("PROJECT_NAME", "FastAPI-Ylab")
-VERSION: str = "0.1.0"
+VERSION: str = "1.0.0"
 
 # Postgres Settings
 POSTGRES_HOST: str = os.getenv("DBHOST", "localhost")

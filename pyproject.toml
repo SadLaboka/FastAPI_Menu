@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "fastapi-ylab"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "API for restaraunt-menu"
 authors = ["sadlaboka <jiutbuh@gmail.com>"]
 readme = "README.md"
 packages = [{include = "fastapi_ylab"}]

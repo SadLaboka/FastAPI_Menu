@@ -3,6 +3,7 @@ from typing import Optional
 import uvicorn
 from fastapi import FastAPI as FastAPIApplication
 
+from src.api.v1.routes import menus
 from src.core import config
 from src.db import Database
 
@@ -36,6 +37,8 @@ async def startup():
 async def shutdown():
     await app.database.disconnect()
 
+
+app.include_router(router=menus.router, prefix="/api/v1/menus")
 
 if __name__ == "__main__":
     uvicorn.run(
