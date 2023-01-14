@@ -1,10 +1,11 @@
 from http import HTTPStatus
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from src.api.v1.schemas import (MenuCreate, MenuListResponse, MenuResponse,
                                 MenuUpdate)
+from src.services import MenuService, get_menu_service
 
 router = APIRouter()
 
@@ -42,9 +43,10 @@ async def menu_detail(
     tags=["menus"]
 )
 async def menu_create(
-        menu: MenuCreate
+        menu: MenuCreate,
+        service: MenuService = Depends(get_menu_service)
 ) -> MenuResponse:
-    menu: dict = dict()
+    menu: dict = await service.create_menu(menu)
     return MenuResponse(**menu)
 
 

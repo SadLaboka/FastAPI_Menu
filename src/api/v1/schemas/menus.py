@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from pydantic import BaseModel
 
 __all__ = (
@@ -14,7 +16,7 @@ class MenuBase(BaseModel):
 
 
 class MenuResponse(MenuBase):
-    id: int
+    id: UUID
     submenus_count: int
     dishes_count: int
 

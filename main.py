@@ -1,16 +1,8 @@
-from typing import Optional
-
 import uvicorn
-from fastapi import FastAPI as FastAPIApplication
+from fastapi import FastAPI
 
 from src.api.v1.routes import menus
 from src.core import config
-from src.db import Database
-
-
-class FastAPI(FastAPIApplication):
-    database: Optional[Database] = None
-
 
 app = FastAPI(
     title=config.PROJECT_NAME,
@@ -24,18 +16,6 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {"service": config.PROJECT_NAME, "version": config.VERSION}
-
-
-@app.on_event("startup")
-async def startup():
-    """Connects to db"""
-    app.database = Database()
-    await app.database.connect()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await app.database.disconnect()
 
 
 app.include_router(router=menus.router, prefix="/api/v1/menus")

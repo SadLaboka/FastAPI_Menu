@@ -1,31 +1,21 @@
-from typing import Optional
+from typing import Generator
 
-from sqlalchemy.ext.asyncio import (AsyncEngine, AsyncSession,
-                                    create_async_engine)
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.core import config
 
 db_base = declarative_base()
 
+engine = create_async_engine(config.DATABASE_URL, future=True, echo=True,
+                             execution_options={"isolation_level": "AUTOCOMMIT"})
 
-class Database:
-    def __init__(self):
-        self._engine: Optional[AsyncEngine] = None
-        self.session: Optional[AsyncSession] = None
+async_session = sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
 
-    async def connect(self, *_: list, **__: dict) -> None:
-        self._engine = create_async_engine(
-            config.DATABASE_URL,
-            echo=True,
-            future=True
-        )
-        self.session = sessionmaker(
-            self._engine,
-            expire_on_commit=False,
-            class_=AsyncSession
-        )
 
-    async def disconnect(self, *_: list, **__: dict) -> None:
-        if self._engine:
-            await self._engine.dispose()
+async def get_session() -> Generator:
+    try:
+        session: AsyncSession = async_session()
+        yield session
+    finally:
+        await session.close()
