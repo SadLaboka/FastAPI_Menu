@@ -4,9 +4,11 @@ from pydantic import BaseModel
 
 __all__ = (
     "MenuResponse",
-    "MenuListResponse",
     "MenuCreate",
-    "MenuUpdate"
+    "MenuUpdate",
+    "SubMenuResponse",
+    "SubMenuCreate",
+    "SubMenuUpdate"
 )
 
 
@@ -29,5 +31,19 @@ class MenuUpdate(MenuBase):
     ...
 
 
-class MenuListResponse(BaseModel):
-    menus: list[MenuResponse] = []
+class SubMenuBase(BaseModel):
+    title: str
+    description: str
+
+
+class SubMenuResponse(SubMenuBase):
+    id: UUID
+    dishes_count: int
+
+
+class SubMenuCreate(SubMenuBase):
+    ...
+
+
+class SubMenuUpdate(SubMenuBase):
+    ...
