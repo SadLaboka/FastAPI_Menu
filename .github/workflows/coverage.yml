@@ -25,8 +25,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: pip install -r requirements.txt
-    - name: create code coverage
-      run: make coverage
+    - name: up docker
+      run: docker-compose -f docker-compose-test.yaml up --build -d
+    - name: migrations
+      run: python -m alembic upgrade head
+    - name: make code coverage
+      run: python -m pytest --cov=src --cov-report=xml
     - name: publish code coverage
       uses: paambaati/codeclimate-action@v3.0.0
       env:
