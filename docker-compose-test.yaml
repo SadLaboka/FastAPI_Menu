@@ -8,6 +8,8 @@ services:
       - POSTGRES_USER=test
       - POSTGRES_PASSWORD=test
       - POSTGRES_DB=test
+    expose:
+      - 5432
     ports:
       - "5432:5432"
     healthcheck:
