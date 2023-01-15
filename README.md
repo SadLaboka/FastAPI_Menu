@@ -6,6 +6,25 @@
 
 Simple FastAPI API for a restaurant menu.
 
+# Usage:
+* ### Create environment variables from file .env.example
+
+* ### 1. With Make: 
+     ```
+     make run
+     ```
+  ### 2. Without Make:
+     ```
+     docker-compose up --build
+     docker-compose exec api python -m alembic upgrade head
+     ```
+  ### 3. Without Docker:
+     ```
+     uvicorn main:app --host 0.0.0.0 --port 8000
+     python -m alembic upgrade head
+     ```
+
+
 # REST API
 
 ## Requests:
