@@ -23,7 +23,15 @@ Simple FastAPI API for a restaurant menu.
      python -m uvicorn main:app --host 0.0.0.0 --port 8000
      python -m alembic upgrade head
      ```
-
+## .env example:
+```
+PROJECT_NAME=Menu
+DBHOST=127.0.0.1
+DBPORT=5432
+DBUSER=postgres
+DBPASSWORD=postgres
+DBNAME=postgres
+```
 
 # REST API
 
