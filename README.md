@@ -26,7 +26,7 @@ Simple FastAPI API for a restaurant menu.
 ## .env example:
 ```
 PROJECT_NAME=Menu
-DBHOST=127.0.0.1
+DBHOST=127.0.0.1       # must be postgres_db for docker
 DBPORT=5432
 DBUSER=postgres
 DBPASSWORD=postgres
