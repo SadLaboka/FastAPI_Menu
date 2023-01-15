@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -28,6 +29,10 @@ target_metadata = db_base.metadata
 
 def get_url():
     from src.core import config
+    test = os.getenv("TEST", None)
+    print(test, "\n++++\n+++\n")
+    if test:
+        return config.TEST_DATABASE_URL
     USER = config.POSTGRES_USER
     PASSWORD = config.POSTGRES_PASSWORD
     HOST = config.POSTGRES_HOST

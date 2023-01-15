@@ -4,8 +4,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.v1.schemas import MenuCreate, MenuResponse, MenuUpdate
-from src.api.v1.schemas.menus import (DishCreate, DishResponse, SubMenuCreate,
-                                      SubMenuResponse, SubMenuUpdate, DishUpdate)
+from src.api.v1.schemas.menus import (DishCreate, DishResponse, DishUpdate,
+                                      SubMenuCreate, SubMenuResponse,
+                                      SubMenuUpdate)
 from src.services import MenuService, get_menu_service
 
 router = APIRouter()
