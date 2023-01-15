@@ -20,7 +20,7 @@ Simple FastAPI API for a restaurant menu.
      ```
   ### 3. Without Docker:
      ```
-     uvicorn main:app --host 0.0.0.0 --port 8000
+     python -m uvicorn main:app --host 0.0.0.0 --port 8000
      python -m alembic upgrade head
      ```
 
