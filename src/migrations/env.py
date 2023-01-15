@@ -30,9 +30,8 @@ target_metadata = db_base.metadata
 def get_url():
     from src.core import config
     test = os.getenv("TEST", None)
-    print(test, "\n++++\n+++\n")
     if test:
-        return config.TEST_DATABASE_URL
+        return "postgresql://test:test@test:5432/test"
     USER = config.POSTGRES_USER
     PASSWORD = config.POSTGRES_PASSWORD
     HOST = config.POSTGRES_HOST
