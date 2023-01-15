@@ -7,9 +7,11 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  coverage:
 
     runs-on: ubuntu-latest
+    env:
+      TEST: 1
     strategy:
       fail-fast: false
       matrix:
