@@ -3,6 +3,7 @@ from typing import Any, Generator
 
 import asyncpg
 import pytest
+from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from starlette.testclient import TestClient
@@ -15,6 +16,12 @@ test_engine = create_async_engine(config.TEST_DATABASE_URL, future=True, echo=Tr
 
 # create session for the interaction with database
 test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
+
+CLEAN_TABLES = [
+    "menu",
+    "submenu",
+    "dish"
+]
 
 
 @pytest.fixture(scope="session")
@@ -34,11 +41,6 @@ async def async_session_test():
 @pytest.fixture(scope="function", autouse=True)
 async def clean_tables(async_session_test):
     """Clean data in all tables before running test function"""
-    CLEAN_TABLES = [
-        "menu",
-        "submenu",
-        "dish"
-    ]
     async with async_session_test() as session:
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
@@ -53,15 +55,14 @@ async def _get_test_db():
 
 
 @pytest.fixture(scope="function")
-async def client() -> Generator[TestClient, Any, None]:
+async def client() -> Generator[AsyncClient, Any, None]:
     """
     Create a new FastAPI TestClient that uses the `db_session` fixture to override
     the `get_db` dependency that is injected into routes.
     """
-
     app.dependency_overrides[get_session] = _get_test_db
-    with TestClient(app) as client:
-        yield client
+    async with AsyncClient(app=app, base_url="http://test") as ac:
+        yield ac
 
 
 @pytest.fixture(scope="session")
@@ -73,9 +74,18 @@ async def asyncpg_pool():
 
 @pytest.fixture
 async def create_menu_in_database(asyncpg_pool):
-
     async def create_menu_in_database(id_: str, title: str, description: str):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute("""INSERT INTO menu VALUES ($1, $2, $3)""",
                                             id_, title, description)
+
     return create_menu_in_database
+
+
+@pytest.fixture(scope="function")
+def menu_data():
+    return {
+        "id_": "4468bbfd-e02e-4936-9e25-402520dcecf2",
+        "title": "Test menu",
+        "description": "Test menu description"
+    }
