@@ -37,20 +37,20 @@ DBNAME=postgres
 
 ## Requests:
 
-| Description                                                            | Request                                                                |
-|------------------------------------------------------------------------|------------------------------------------------------------------------|
-| Get menu list                                                          | `GET /api/v1/menus/`                                                   |
-| Create a menu                                                          | `POST /api/v1/menus/`                                                  |
-| Get a specific menu                                                    | `GET /api/v1/menus/{menu_id}`                                          |
-| Delete a menu                                                          | `DELETE /api/v1/menus/{menu_id}`                                       |
-| Update a menu                                                          | `PATCH /api/v1/menus/{menu_id}`                                        |
-| Get submenu list                                                       | `GET /api/v1/menus/{menu_id}/submenus`                                 |
-| Create a submenu                                                       | `POST /api/v1/menus/{menu_id}/submenus`                                |
-| Get a specific submenu                                                 | `GET /api/v1/menus/{menu_id}/submenus/{submenu_id}`                    |
-| Delete a submenu                                                       | `DELETE /api/v1/menus/{menu_id}/submenus/{submenu_id}`                 |
-| Update a submenu                                                       | `PATCH /api/v1/menus/{menu_id}/submenus/{submenu_id}`                  |
-| Get dishes list                                                        | `GET /api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes`             |
-| Create a dish                                                          | `POST /api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes`            |
-| Get a specific dish                                                    | `GET /api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}`   |
-| Delete a dish                                                          | `DELETE /api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}`|
-| Update a dish                                                          | `PATCH /api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}` |
+| Description           | Method                                            | Request                                                                |
+|-----------------------|---------------------------------------------------|------------------------------------------------------------------------|
+| Get menu list         |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/`                                                       |
+| Create a menu         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/`                                                       |
+| Get a specific menu   |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}`                                              |
+| Delete a menu         |![DELETE](https://img.shields.io/badge/-DELETE-red)| `/api/v1/menus/{menu_id}`                                              |
+| Update a menu         |![PATCH](https://img.shields.io/badge/-PATCH-9cf)  | `/api/v1/menus/{menu_id}`                                              |
+| Get submenu list      |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}/submenus`                                     |
+| Create a submenu      |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/{menu_id}/submenus`                                     |
+| Get a specific submenu|![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}/submenus/{submenu_id}`                        |
+| Delete a submenu      |![DELETE](https://img.shields.io/badge/-DELETE-red)| `/api/v1/menus/{menu_id}/submenus/{submenu_id}`                        |
+| Update a submenu      |![PATCH](https://img.shields.io/badge/-PATCH-9cf)  | `/api/v1/menus/{menu_id}/submenus/{submenu_id}`                        |
+| Get dishes list       |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes`                 |
+| Create a dish         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes`                 |
+| Get a specific dish   |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}`       |
+| Delete a dish         |![DELETE](https://img.shields.io/badge/-DELETE-red)| `/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}`       |
+| Update a dish         |![PATCH](https://img.shields.io/badge/-PATCH-9cf)  | `/api/v1/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}`       |
