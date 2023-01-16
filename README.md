@@ -1,3 +1,5 @@
+[![My Skills](https://skillicons.dev/icons?i=py,fastapi,postgres,docker,github)](https://skillicons.dev)
+
 # FastAPI_Menu
 
 [![Maintainability](https://api.codeclimate.com/v1/badges/e9159925efd9c3308368/maintainability)](https://codeclimate.com/github/SadLaboka/FastAPI_Menu/maintainability)
