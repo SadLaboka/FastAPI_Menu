@@ -42,11 +42,9 @@ jobs:
       run: pip install -r requirements.txt
     - name: migrations
       run: python -m alembic upgrade head
-    - name: make code coverage
-      run: python -m pytest --cov=src --cov-report=xml
     - name: publish code coverage
       uses: paambaati/codeclimate-action@v3.0.0
       env:
         CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
       with:
-        coverageCommand: make coverage
+        coverageCommand: python -m pytest --cov=src --cov-report=xml
