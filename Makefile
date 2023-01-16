@@ -22,8 +22,4 @@ test: test-base
 	stop-test-base
 
 
-coverage: test-base
-	python -m pytest --cov=src --cov-report=xml
-
-
 .PHONY: run stop test
