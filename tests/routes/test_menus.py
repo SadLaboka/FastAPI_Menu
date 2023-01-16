@@ -1,11 +1,5 @@
 import json
 
-import pytest
-from fastapi import HTTPException
-
-
-# from uuid import uuid4
-
 
 class TestMenuRoutes:
 
@@ -90,4 +84,3 @@ class TestMenuRoutes:
         resp_data = resp.json()
         assert resp_data["status"] is True
         assert resp_data["message"] == "The menu has been deleted"
-
