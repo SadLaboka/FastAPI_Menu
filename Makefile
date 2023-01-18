@@ -22,4 +22,8 @@ test: test-base
 	stop-test-base
 
 
-.PHONY: run stop test
+logs:
+	docker-compose logs api
+
+
+.PHONY: run stop test logs
