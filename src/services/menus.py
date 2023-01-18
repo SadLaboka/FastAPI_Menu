@@ -7,7 +7,7 @@ from src.accessors import MenuAccessor
 from src.api.v1.schemas import (DishCreate, DishUpdate, MenuCreate, MenuUpdate,
                                 SubMenuCreate, SubMenuUpdate)
 from src.db import get_session
-from src.models import DishModel, MenuModel, SubMenuModel
+from src.models import Dish, Menu, SubMenu
 from src.services.mixins import ServiceMixin
 
 
@@ -136,7 +136,7 @@ class MenuService(ServiceMixin):
             return answer
 
     @staticmethod
-    async def make_dish_answer(dish: DishModel) -> dict:
+    async def make_dish_answer(dish: Dish) -> dict:
         """Converts an object to the desired format"""
         return {
             'id': dish.id,
@@ -146,7 +146,7 @@ class MenuService(ServiceMixin):
         }
 
     @staticmethod
-    async def make_menu_answer(menu: MenuModel) -> dict:
+    async def make_menu_answer(menu: Menu) -> dict:
         """Converts an object to the desired format"""
         return {
             'id': menu.id,
@@ -157,7 +157,7 @@ class MenuService(ServiceMixin):
         }
 
     @staticmethod
-    async def make_submenu_answer(submenu: SubMenuModel) -> dict:
+    async def make_submenu_answer(submenu: SubMenu) -> dict:
         """Converts an object to the desired format"""
         return {
             'id': submenu.id,

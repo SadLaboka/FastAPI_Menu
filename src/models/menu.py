@@ -1,10 +1,36 @@
 import uuid
+from dataclasses import dataclass
+from typing import List
 
 from sqlalchemy import Column, Float, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
 from src.db import db_base
+
+
+@dataclass
+class Dish:
+    id: uuid.UUID
+    title: str
+    description: str
+    price: float
+
+
+@dataclass
+class SubMenu:
+    id: uuid.UUID
+    title: str
+    description: str
+    dishes: List[Dish]
+
+
+@dataclass
+class Menu:
+    id: uuid.UUID
+    title: str
+    description: str
+    submenus: List[SubMenu]
 
 
 class MenuModel(db_base):
@@ -19,6 +45,14 @@ class MenuModel(db_base):
         cascade="all, delete",
         passive_deletes=True
     )
+
+    def to_dc(self) -> Menu:
+        return Menu(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            submenus=[s.to_dc() for s in self.submenus]
+        )
 
 
 class SubMenuModel(db_base):
@@ -39,6 +73,14 @@ class SubMenuModel(db_base):
         passive_deletes=True
     )
 
+    def to_dc(self) -> SubMenu:
+        return SubMenu(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            dishes=[d.to_dc() for d in self.dishes],
+        )
+
 
 class DishModel(db_base):
     __tablename__ = "dish"
@@ -52,3 +94,11 @@ class DishModel(db_base):
         ForeignKey("submenu.id", ondelete="CASCADE"), nullable=False
     )
     submenu = relationship("SubMenuModel", back_populates="dishes")
+
+    def to_dc(self) -> Dish:
+        return Dish(
+            id=self.id,
+            title=self.title,
+            description=self.description,
+            price=self.price
+        )
