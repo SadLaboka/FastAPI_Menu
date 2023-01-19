@@ -31,7 +31,8 @@ def get_url():
     from src.core import config
     test = os.getenv("TEST", None)
     if test:
-        return "postgresql://test:test@test-db:5432/test"
+        TEST_DB_URL = config.TEST_DB_URL
+        return f"postgresql://test:test@{TEST_DB_URL}:5432/test"
     USER = config.POSTGRES_USER
     PASSWORD = config.POSTGRES_PASSWORD
     HOST = config.POSTGRES_HOST
