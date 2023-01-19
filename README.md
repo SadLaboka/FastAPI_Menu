@@ -18,7 +18,6 @@ Simple FastAPI API for a restaurant menu.
   ### 2. Without Make:
      ```
      docker-compose up --build
-     docker-compose exec api python -m alembic upgrade head
      ```
   ### 3. Without Docker:
      ```
@@ -34,6 +33,16 @@ DBUSER=postgres
 DBPASSWORD=postgres
 DBNAME=postgres
 ```
+
+# Running tests:
+ ### 1. With Make:
+   ```
+     make test
+   ```
+ ### 2. With Docker:
+   ```
+     docker-compose -f docker-compose-test.yaml up --build
+   ```
 
 # REST API
 
