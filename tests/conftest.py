@@ -1,5 +1,4 @@
 import asyncio
-import uuid
 from typing import Any, Generator
 
 import asyncpg
