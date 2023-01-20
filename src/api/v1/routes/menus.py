@@ -224,7 +224,7 @@ async def dish_create(
 ) -> DishResponse:
     dish: Optional[dict] = await service.create_dish(submenu_id, dish)
     if not dish:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
     return DishResponse(**dish)
 
 

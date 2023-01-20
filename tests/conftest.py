@@ -1,4 +1,5 @@
 import asyncio
+import uuid
 from typing import Any, Generator
 
 import asyncpg
@@ -53,7 +54,7 @@ async def _get_test_db():
         pass
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 async def client() -> Generator[AsyncClient, Any, None]:
     """
     Create a new FastAPI TestClient that uses the `db_session` fixture to override
@@ -81,7 +82,66 @@ async def create_menu_in_database(asyncpg_pool):
     return create_menu_in_database
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
+async def create_submenu_in_database(asyncpg_pool):
+    async def create_submenu_in_database(id_: str, title: str, description: str, menu_id: str):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute("""INSERT INTO submenu VALUES ($1, $2, $3, $4)""",
+                                            id_, title, description, menu_id)
+
+    return create_submenu_in_database
+
+
+@pytest.fixture
+async def create_dish_in_database(asyncpg_pool):
+    async def create_dish_in_database(id_: str, title: str, description: str, price: float, submenu_id: str):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute("""INSERT INTO dish VALUES ($1, $2, $3, $4, $5)""",
+                                            id_, title, description, price, submenu_id)
+
+    return create_dish_in_database
+
+
+@pytest.fixture
+async def delete_submenu_from_database(asyncpg_pool):
+    async def delete_submenu_from_database(id_: str):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute("""DELETE FROM submenu WHERE id = $1;""", id_)
+
+    return delete_submenu_from_database
+
+
+@pytest.fixture
+async def delete_menu_from_database(asyncpg_pool):
+    async def delete_menu_from_database(id_: str):
+        async with asyncpg_pool.acquire() as connection:
+            return await connection.execute("""DELETE FROM menu WHERE id = $1;""", id_)
+
+    return delete_menu_from_database
+
+
+@pytest.fixture
+def dish_data():
+    return {
+        "id_": "4468bbfd-e02e-4936-9e27-402520dcecf2",
+        "submenu_id": "4468bbfd-e02e-4936-9e26-402520dcecf2",
+        "title": "Test dish",
+        "price": 14.5,
+        "description": "Test dish description"
+    }
+
+
+@pytest.fixture
+def submenu_data():
+    return {
+        "id_": "4468bbfd-e02e-4936-9e26-402520dcecf2",
+        "menu_id": "4468bbfd-e02e-4936-9e25-402520dcecf2",
+        "title": "Test submenu",
+        "description": "Test submenu description"
+    }
+
+
+@pytest.fixture
 def menu_data():
     return {
         "id_": "4468bbfd-e02e-4936-9e25-402520dcecf2",

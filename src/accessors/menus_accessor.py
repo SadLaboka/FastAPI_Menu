@@ -10,12 +10,14 @@ from src.models import Dish, DishModel, Menu, MenuModel, SubMenu, SubMenuModel
 class MenuAccessor(BaseAccessor):
     async def create_menu(self, title: str, description: str) -> Menu:
         menu = MenuModel(title=title, description=description)
-        async with self.session as db_session:
-            async with db_session.begin():
-                self.session.add(menu)
-                await self.session.flush()
-        new_menu = await self.get_menu_by_id(menu.id)
-        return new_menu
+        try:
+            async with self.session as db_session:
+                async with db_session.begin():
+                    self.session.add(menu)
+                    await self.session.flush()
+        finally:
+            new_menu = await self.get_menu_by_id(menu.id)
+            return new_menu
 
     async def delete_menu_by_id(self, id_: str) -> bool:
         async with self.session as db_session:
@@ -63,12 +65,14 @@ class MenuAccessor(BaseAccessor):
 
     async def create_submenu(self, menu_id: str, title: str, description: str) -> SubMenu:
         submenu = SubMenuModel(title=title, description=description, menu_id=menu_id)
-        async with self.session as db_session:
-            async with db_session.begin():
-                self.session.add(submenu)
-        await self.session.flush()
-        new_submenu = await self.get_submenu_by_id(submenu.id)
-        return new_submenu
+        try:
+            async with self.session as db_session:
+                async with db_session.begin():
+                    self.session.add(submenu)
+                    await self.session.flush()
+        finally:
+            new_submenu = await self.get_submenu_by_id(submenu.id)
+            return new_submenu
 
     async def get_submenu_by_id(self, id_: str) -> Optional[SubMenu]:
         async with self.session as db_session:
@@ -117,11 +121,13 @@ class MenuAccessor(BaseAccessor):
 
     async def create_dish(self, submenu_id: str, title: str, description: str, price: str) -> Dish:
         dish = DishModel(submenu_id=submenu_id, title=title, description=description, price=float(price))
-        async with self.session as db_session:
-            async with db_session.begin():
-                self.session.add(dish)
-                await self.session.flush()
-        return dish
+        try:
+            async with self.session as db_session:
+                async with db_session.begin():
+                    self.session.add(dish)
+                    await self.session.flush()
+        finally:
+            return dish.to_dc() if dish.id else None
 
     async def get_dish_by_id(self, dish_id: str) -> Optional[Dish]:
         async with self.session as db_session:
