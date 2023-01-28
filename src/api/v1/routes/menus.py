@@ -14,6 +14,7 @@ router = APIRouter()
 @router.get(
     path="/",
     summary="Get menu list",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def menu_list(service: MenuService = Depends(get_menu_service)):
@@ -25,6 +26,7 @@ async def menu_list(service: MenuService = Depends(get_menu_service)):
     path="/{menu_id}",
     response_model=MenuResponse,
     summary="Get a specific menu",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def menu_detail(
@@ -72,6 +74,7 @@ async def menu_update(
 @router.delete(
     path="/{menu_id}",
     summary="Delete a menu",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def menu_delete(
@@ -87,6 +90,7 @@ async def menu_delete(
 @router.get(
     path="/{menu_id}/submenus",
     summary="Get submenu list",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def submenu_list(
@@ -101,6 +105,7 @@ async def submenu_list(
     path="/{menu_id}/submenus/{submenu_id}",
     response_model=SubMenuResponse,
     summary="Get a specific submenu",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def submenu_detail(
@@ -135,6 +140,7 @@ async def submenu_create(
     path="/{menu_id}/submenus/{submenu_id}",
     response_model=SubMenuResponse,
     summary="Update a submenu",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def submenu_update(
@@ -151,6 +157,7 @@ async def submenu_update(
 @router.delete(
     path="/{menu_id}/submenus/{submenu_id}",
     summary="Delete a submenu",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def submenu_delete(
@@ -166,6 +173,7 @@ async def submenu_delete(
 @router.get(
     path="/{menu_id}/submenus/{submenu_id}/dishes",
     summary="Get dishes list",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def dish_list(
@@ -180,6 +188,7 @@ async def dish_list(
     path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     response_model=DishResponse,
     summary="Get a specific dish",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def dish_detail(
@@ -196,6 +205,7 @@ async def dish_detail(
     path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     response_model=DishResponse,
     summary="Update a dish",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def dish_update(
@@ -230,6 +240,7 @@ async def dish_create(
 @router.delete(
     path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     summary="Delete a dish",
+    status_code=HTTPStatus.OK,
     tags=["menus"],
 )
 async def dish_delete(
