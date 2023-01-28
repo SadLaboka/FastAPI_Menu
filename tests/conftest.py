@@ -6,6 +6,7 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 
 from main import app
 from src.core import config
@@ -43,7 +44,7 @@ async def clean_tables(async_session_test):
     async with async_session_test() as session:
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
-                await session.execute(f"""TRUNCATE TABLE {table_for_cleaning} CASCADE;""")
+                await session.execute(text(f"""TRUNCATE TABLE {table_for_cleaning} CASCADE;"""))
 
 
 async def _get_test_db():
