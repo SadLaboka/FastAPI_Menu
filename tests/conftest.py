@@ -1,5 +1,6 @@
 import asyncio
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 import asyncpg
 import pytest
@@ -20,7 +21,7 @@ test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=As
 CLEAN_TABLES = [
     "menu",
     "submenu",
-    "dish"
+    "dish",
 ]
 
 
@@ -76,8 +77,10 @@ async def asyncpg_pool():
 async def create_menu_in_database(asyncpg_pool):
     async def create_menu_in_database(id_: str, title: str, description: str):
         async with asyncpg_pool.acquire() as connection:
-            return await connection.execute("""INSERT INTO menu VALUES ($1, $2, $3)""",
-                                            id_, title, description)
+            return await connection.execute(
+                """INSERT INTO menu VALUES ($1, $2, $3)""",
+                id_, title, description,
+            )
 
     return create_menu_in_database
 
@@ -86,8 +89,10 @@ async def create_menu_in_database(asyncpg_pool):
 async def create_submenu_in_database(asyncpg_pool):
     async def create_submenu_in_database(id_: str, title: str, description: str, menu_id: str):
         async with asyncpg_pool.acquire() as connection:
-            return await connection.execute("""INSERT INTO submenu VALUES ($1, $2, $3, $4)""",
-                                            id_, title, description, menu_id)
+            return await connection.execute(
+                """INSERT INTO submenu VALUES ($1, $2, $3, $4)""",
+                id_, title, description, menu_id,
+            )
 
     return create_submenu_in_database
 
@@ -96,8 +101,10 @@ async def create_submenu_in_database(asyncpg_pool):
 async def create_dish_in_database(asyncpg_pool):
     async def create_dish_in_database(id_: str, title: str, description: str, price: float, submenu_id: str):
         async with asyncpg_pool.acquire() as connection:
-            return await connection.execute("""INSERT INTO dish VALUES ($1, $2, $3, $4, $5)""",
-                                            id_, title, description, price, submenu_id)
+            return await connection.execute(
+                """INSERT INTO dish VALUES ($1, $2, $3, $4, $5)""",
+                id_, title, description, price, submenu_id,
+            )
 
     return create_dish_in_database
 
@@ -127,7 +134,7 @@ def dish_data():
         "submenu_id": "4468bbfd-e02e-4936-9e26-402520dcecf2",
         "title": "Test dish",
         "price": 14.5,
-        "description": "Test dish description"
+        "description": "Test dish description",
     }
 
 
@@ -137,7 +144,7 @@ def submenu_data():
         "id_": "4468bbfd-e02e-4936-9e26-402520dcecf2",
         "menu_id": "4468bbfd-e02e-4936-9e25-402520dcecf2",
         "title": "Test submenu",
-        "description": "Test submenu description"
+        "description": "Test submenu description",
     }
 
 
@@ -146,5 +153,5 @@ def menu_data():
     return {
         "id_": "4468bbfd-e02e-4936-9e25-402520dcecf2",
         "title": "Test menu",
-        "description": "Test menu description"
+        "description": "Test menu description",
     }

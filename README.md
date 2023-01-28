@@ -11,7 +11,7 @@ Simple FastAPI API for a restaurant menu.
 # Usage:
 * ### Create environment variables from file .env.example
 
-* ### 1. With Make: 
+* ### 1. With Make:
      ```
      make run
      ```

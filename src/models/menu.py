@@ -1,6 +1,5 @@
 import uuid
 from dataclasses import dataclass
-from typing import List
 
 from sqlalchemy import Column, Float, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
@@ -22,7 +21,7 @@ class SubMenu:
     id: uuid.UUID
     title: str
     description: str
-    dishes: List[Dish]
+    dishes: list[Dish]
 
 
 @dataclass
@@ -30,7 +29,7 @@ class Menu:
     id: uuid.UUID
     title: str
     description: str
-    submenus: List[SubMenu]
+    submenus: list[SubMenu]
 
 
 class MenuModel(db_base):
@@ -43,7 +42,7 @@ class MenuModel(db_base):
         "SubMenuModel",
         back_populates="menu",
         cascade="all, delete",
-        passive_deletes=True
+        passive_deletes=True,
     )
 
     def to_dc(self) -> Menu:
@@ -51,7 +50,7 @@ class MenuModel(db_base):
             id=self.id,
             title=self.title,
             description=self.description,
-            submenus=[s.to_dc() for s in self.submenus]
+            submenus=[s.to_dc() for s in self.submenus],
         )
 
 
@@ -63,14 +62,14 @@ class SubMenuModel(db_base):
     description = Column(String(200), nullable=True, unique=False)
     menu_id = Column(
         UUID,
-        ForeignKey("menu.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("menu.id", ondelete="CASCADE"), nullable=False,
     )
     menu = relationship("MenuModel", back_populates="submenus")
     dishes = relationship(
         "DishModel",
         back_populates="submenu",
         cascade="all, delete",
-        passive_deletes=True
+        passive_deletes=True,
     )
 
     def to_dc(self) -> SubMenu:
@@ -91,7 +90,7 @@ class DishModel(db_base):
     price = Column(Float(2), nullable=False)
     submenu_id = Column(
         UUID,
-        ForeignKey("submenu.id", ondelete="CASCADE"), nullable=False
+        ForeignKey("submenu.id", ondelete="CASCADE"), nullable=False,
     )
     submenu = relationship("SubMenuModel", back_populates="dishes")
 
@@ -100,5 +99,5 @@ class DishModel(db_base):
             id=self.id,
             title=self.title,
             description=self.description,
-            price=self.price
+            price=self.price,
         )

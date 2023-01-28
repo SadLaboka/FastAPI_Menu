@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{include = "fastapi_ylab"}]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.10"
 fastapi = "^0.89.1"
 uvicorn = "^0.20.0"
 python-dotenv = "^0.21.0"
@@ -24,6 +24,7 @@ ipython = "^8.8.0"
 isort = "^5.11.4"
 flake8 = "^6.0.0"
 httpx = "^0.23.3"
+pre-commit = "^3.0.1"
 
 
 [build-system]

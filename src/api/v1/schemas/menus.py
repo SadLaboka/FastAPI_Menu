@@ -12,7 +12,7 @@ __all__ = (
     "MenuUpdate",
     "SubMenuResponse",
     "SubMenuCreate",
-    "SubMenuUpdate"
+    "SubMenuUpdate",
 )
 
 
