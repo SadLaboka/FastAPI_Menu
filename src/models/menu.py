@@ -10,7 +10,7 @@ from src.db import db_base
 
 @dataclass
 class Dish:
-    id: uuid.UUID
+    id: str
     title: str
     description: str
     price: float
@@ -18,7 +18,7 @@ class Dish:
 
 @dataclass
 class SubMenu:
-    id: uuid.UUID
+    id: str
     title: str
     description: str
     dishes: list[Dish]
@@ -26,7 +26,7 @@ class SubMenu:
 
 @dataclass
 class Menu:
-    id: uuid.UUID
+    id: str
     title: str
     description: str
     submenus: list[SubMenu]
@@ -47,7 +47,7 @@ class MenuModel(db_base):
 
     def to_dc(self) -> Menu:
         return Menu(
-            id=self.id,
+            id=str(self.id),
             title=self.title,
             description=self.description,
             submenus=[s.to_dc() for s in self.submenus],
@@ -74,7 +74,7 @@ class SubMenuModel(db_base):
 
     def to_dc(self) -> SubMenu:
         return SubMenu(
-            id=self.id,
+            id=str(self.id),
             title=self.title,
             description=self.description,
             dishes=[d.to_dc() for d in self.dishes],
@@ -96,7 +96,7 @@ class DishModel(db_base):
 
     def to_dc(self) -> Dish:
         return Dish(
-            id=self.id,
+            id=str(self.id),
             title=self.title,
             description=self.description,
             price=self.price,

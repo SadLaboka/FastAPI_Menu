@@ -161,10 +161,11 @@ async def submenu_update(
     tags=["menus"],
 )
 async def submenu_delete(
+        menu_id: str,
         submenu_id: str,
         service: MenuService = Depends(get_menu_service),
 ) -> dict:
-    result: bool = await service.delete_submenu(submenu_id)
+    result: bool = await service.delete_submenu(menu_id=menu_id, submenu_id=submenu_id)
     if not result:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="submenu not found")
     return {"status": True, "message": "The submenu has been deleted"}
@@ -227,11 +228,12 @@ async def dish_update(
     tags=["menus"],
 )
 async def dish_create(
+        menu_id: str,
         submenu_id: str,
         dish: DishCreate,
         service: MenuService = Depends(get_menu_service),
 ) -> DishResponse:
-    dish: dict | None = await service.create_dish(submenu_id, dish)
+    dish: dict | None = await service.create_dish(menu_id=menu_id, submenu_id=submenu_id, dish=dish)
     if not dish:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
     return DishResponse(**dish)
@@ -244,10 +246,12 @@ async def dish_create(
     tags=["menus"],
 )
 async def dish_delete(
+        menu_id: str,
+        submenu_id: str,
         dish_id: str,
         service: MenuService = Depends(get_menu_service),
 ) -> dict:
-    result: bool = await service.delete_dish(dish_id)
+    result: bool = await service.delete_dish(menu_id=menu_id, submenu_id=submenu_id, dish_id=dish_id)
     if not result:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="dish not found")
     return {"status": True, "message": "The dish has been deleted"}

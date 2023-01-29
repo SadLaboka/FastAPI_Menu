@@ -12,6 +12,31 @@ from sqlalchemy.sql import text
 from main import app
 from src.core import config
 from src.db import get_session
+from src.db.cache import AbstractCache, get_cache
+
+
+class TestCache(AbstractCache):
+
+    async def get(self, key: str):
+        return self.cache.get(key)
+
+    async def set(
+            self,
+            key: str,
+            value: bytes | str,
+            expire: int = config.CACHE_EXPIRE_IN_SECONDS,
+    ):
+        self.cache[key] = value
+
+    async def remove(self, key: str):
+        try:
+            self.cache.pop(key)
+        except KeyError:
+            pass
+
+    async def close(self):
+        pass
+
 
 test_engine = create_async_engine(config.TEST_DATABASE_URL, future=True, echo=True)
 
@@ -55,6 +80,10 @@ async def _get_test_db():
         pass
 
 
+async def _get_test_cache():
+    return TestCache(dict())
+
+
 @pytest.fixture
 async def client() -> Generator[AsyncClient, Any, None]:
     """
@@ -62,6 +91,7 @@ async def client() -> Generator[AsyncClient, Any, None]:
     the `get_db` dependency that is injected into routes.
     """
     app.dependency_overrides[get_session] = _get_test_db
+    app.dependency_overrides[get_cache] = _get_test_cache
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
 

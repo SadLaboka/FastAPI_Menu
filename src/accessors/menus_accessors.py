@@ -1,11 +1,46 @@
+import json
+
 from sqlalchemy import select, update
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from src.accessors import BaseAccessor
+from src.db.cache import AbstractCache
 from src.models import Dish, DishModel, Menu, MenuModel, SubMenu, SubMenuModel
 
 
-class MenuAccessor(BaseAccessor):
+class MenuCacheAccessor:
+    def __init__(self, cache: AbstractCache):
+        self.cache = cache
+
+    async def set_item(self, type_: str, item: dict) -> None:
+        item_id = item["id"]
+        key = f"{type_}:{item_id}"
+        await self.cache.set(key, json.dumps(item))
+
+    async def get_item(self, type_: str, id_: str) -> dict | None:
+        key = f"{type_}:{id_}"
+        item = await self.cache.get(key)
+        return json.loads(item) if item else None
+
+    async def set_list(self, key: str, items: list):
+        await self.cache.set(key, json.dumps(items))
+
+    async def get_list(self, key: str) -> list | None:
+        items = await self.cache.get(key)
+        return json.loads(items) if items else None
+
+    async def delete(self, type_: str, id_: str):
+        await self.cache.remove(f"{type_}:{id_}")
+
+    async def delete_list(self, key: str):
+        print(f"+++\n+++\n+++\n {type(self.cache)}\n +++\n +++ \n +++ ")
+        await self.cache.remove(key)
+
+
+class MenuAccessor:
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
     async def create_menu(self, title: str, description: str) -> Menu:
         menu = MenuModel(title=title, description=description)
         try:

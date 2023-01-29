@@ -1,6 +1,8 @@
+aioredis==2.0.1
 alembic==1.9.2
 anyio==3.6.2
 asttokens==2.2.1
+async-timeout==4.0.2
 asyncpg==0.27.0
 attrs==22.1.0
 backcall==0.2.0

@@ -1,10 +1,11 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.accessors import MenuAccessor
+from src.accessors import MenuAccessor, MenuCacheAccessor
 from src.api.v1.schemas import (DishCreate, DishUpdate, MenuCreate, MenuUpdate,
                                 SubMenuCreate, SubMenuUpdate)
 from src.db import get_session
+from src.db.cache import AbstractCache, get_cache
 from src.models import Dish, Menu, SubMenu
 from src.services.mixins import ServiceMixin
 
@@ -12,130 +13,169 @@ from src.services.mixins import ServiceMixin
 class MenuService(ServiceMixin):
     async def create_menu(self, menu: MenuCreate) -> dict:
         """Creates a new menu."""
-        menu_accessor = MenuAccessor(self.session)
-        new_menu = await menu_accessor.create_menu(title=menu.title, description=menu.description)
+        new_menu = await self.accessor.create_menu(title=menu.title, description=menu.description)
 
         answer = await self.make_menu_answer(new_menu)
+        await self.cache_accessor.set_item(type_="menu", item=answer)
+        await self.cache_accessor.delete_list("menus")
         return answer
 
     async def delete_menu(self, menu_id: str) -> bool:
         """Deletes menu by given id."""
-        menu_accessor = MenuAccessor(self.session)
-        result = await menu_accessor.delete_menu_by_id(id_=menu_id)
-
+        result = await self.accessor.delete_menu_by_id(id_=menu_id)
+        await self.cache_accessor.delete(type_="menu", id_=menu_id)
+        await self.cache_accessor.delete_list("menus")
         return result
 
     async def get_menu(self, menu_id: str) -> dict | None:
         """Gets a menu for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        menu = await menu_accessor.get_menu_by_id(id_=menu_id)
+        cached_menu = await self.cache_accessor.get_item(type_="menu", id_=menu_id)
+        if cached_menu:
+            return cached_menu
+        menu = await self.accessor.get_menu_by_id(id_=menu_id)
         if menu:
             answer = await self.make_menu_answer(menu)
+            await self.cache_accessor.set_item(type_="menu", item=answer)
             return answer
 
     async def get_menu_list(self) -> list[dict]:
         """Gets a menu list."""
-        menu_accessor = MenuAccessor(self.session)
-        menus = await menu_accessor.get_menus()
+        cached_menus = await self.cache_accessor.get_list("menus")
+        if cached_menus:
+            return cached_menus
 
-        return [await self.make_menu_answer(menu) for menu in menus]
+        menus = await self.accessor.get_menus()
+        menus_list = [await self.make_menu_answer(menu) for menu in menus]
+        await self.cache_accessor.set_list("menus", menus_list)
+        return menus_list
 
     async def update_menu(self, menu_id: str, new_data: MenuUpdate) -> dict | None:
         """Updates a menu for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        menu = await menu_accessor.update_menu(
+        menu = await self.accessor.update_menu(
             id_=menu_id, title=new_data.title, description=new_data.description,
         )
         if menu:
             answer = await self.make_menu_answer(menu)
+            await self.cache_accessor.set_item(type_="menu", item=answer)
+            await self.cache_accessor.delete_list("menus")
             return answer
 
     async def create_submenu(self, menu_id: str, submenu: SubMenuCreate) -> dict | None:
         """Creates a new submenu."""
-        menu_accessor = MenuAccessor(self.session)
-        submenu = await menu_accessor.create_submenu(
+        submenu = await self.accessor.create_submenu(
             menu_id=menu_id, title=submenu.title, description=submenu.description,
         )
         if submenu:
             answer = await self.make_submenu_answer(submenu)
+            await self.cache_accessor.set_item(type_="submenu", item=answer)
+            await self.cache_accessor.delete_list("submenus")
+            await self.cache_accessor.delete_list("menus")
+            await self.cache_accessor.delete(type_="menu", id_=menu_id)
             return answer
 
-    async def delete_submenu(self, submenu_id: str) -> bool:
+    async def delete_submenu(self, menu_id: str, submenu_id: str) -> bool:
         """Deletes submenu by given id."""
-        menu_accessor = MenuAccessor(self.session)
-        result = await menu_accessor.delete_submenu_by_id(id_=submenu_id)
+        result = await self.accessor.delete_submenu_by_id(id_=submenu_id)
+        await self.cache_accessor.delete(type_="submenu", id_=submenu_id)
+        await self.cache_accessor.delete_list("submenus")
+        await self.cache_accessor.delete_list("menus")
+        await self.cache_accessor.delete(type_="menu", id_=menu_id)
 
         return result
 
     async def get_submenu(self, submenu_id: str) -> dict | None:
         """Gets a submenu for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        submenu = await menu_accessor.get_submenu_by_id(id_=submenu_id)
+        cached_submenu = await self.cache_accessor.get_item(type_="submenu", id_=submenu_id)
+        if cached_submenu:
+            return cached_submenu
+        submenu = await self.accessor.get_submenu_by_id(id_=submenu_id)
         if submenu:
             answer = await self.make_submenu_answer(submenu)
+            await self.cache_accessor.set_item(type_="submenu", item=answer)
             return answer
 
     async def get_submenus(self, menu_id: str) -> list[dict]:
         """Gets a submenu list."""
-        menu_accessor = MenuAccessor(self.session)
-        submenus = await menu_accessor.get_submenus(menu_id=menu_id)
-
-        return [await self.make_submenu_answer(submenu) for submenu in submenus]
+        cached_submenus = await self.cache_accessor.get_list("submenus")
+        if cached_submenus:
+            return cached_submenus
+        submenus = await self.accessor.get_submenus(menu_id=menu_id)
+        submenus_list = [await self.make_submenu_answer(submenu) for submenu in submenus]
+        await self.cache_accessor.set_list(key="submenus", items=submenus_list)
+        return submenus_list
 
     async def update_submenu(self, submenu_id: str, new_data: SubMenuUpdate) -> dict | None:
         """Updates a submenu for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        submenu = await menu_accessor.update_submenu(
+        submenu = await self.accessor.update_submenu(
             id_=submenu_id, title=new_data.title, description=new_data.description,
         )
         if submenu:
             answer = await self.make_submenu_answer(submenu)
+            await self.cache_accessor.set_item(type_="submenu", item=answer)
+            await self.cache_accessor.delete_list("submenus")
             return answer
 
-    async def create_dish(self, submenu_id: str, dish: DishCreate) -> dict | None:
+    async def create_dish(self, menu_id: str, submenu_id: str, dish: DishCreate) -> dict | None:
         """Creates a new dish."""
-        menu_accessor = MenuAccessor(self.session)
-        dish = await menu_accessor.create_dish(
+        dish = await self.accessor.create_dish(
             submenu_id=submenu_id, title=dish.title, description=dish.description, price=dish.price,
         )
 
         if dish:
             answer = await self.make_dish_answer(dish)
+            await self.cache_accessor.set_item(type_="dish", item=answer)
+            await self.cache_accessor.delete_list("submenus")
+            await self.cache_accessor.delete_list("menus")
+            await self.cache_accessor.delete_list("dishes")
+            await self.cache_accessor.delete(type_="menu", id_=menu_id)
+            await self.cache_accessor.delete(type_="submenu", id_=submenu_id)
             return answer
 
-    async def delete_dish(self, dish_id: str) -> bool:
+    async def delete_dish(self, menu_id: str, submenu_id: str, dish_id: str) -> bool:
         """Deletes dish by given id."""
-        menu_accessor = MenuAccessor(self.session)
-        result = await menu_accessor.delete_dish_by_id(dish_id=dish_id)
+        result = await self.accessor.delete_dish_by_id(dish_id=dish_id)
+        await self.cache_accessor.delete_list("submenus")
+        await self.cache_accessor.delete_list("menus")
+        await self.cache_accessor.delete_list("dishes")
+        await self.cache_accessor.delete(type_="menu", id_=menu_id)
+        await self.cache_accessor.delete(type_="submenu", id_=submenu_id)
+        await self.cache_accessor.delete(type_="dish", id_=dish_id)
 
         return result
 
     async def get_dish(self, dish_id: str) -> dict | None:
         """Gets a dish for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        dish = await menu_accessor.get_dish_by_id(dish_id=dish_id)
+        cached_dish = await self.cache_accessor.get_item(type_="dish", id_=dish_id)
+        if cached_dish:
+            return cached_dish
+        dish = await self.accessor.get_dish_by_id(dish_id=dish_id)
 
         if dish:
             answer = await self.make_dish_answer(dish)
+            await self.cache_accessor.set_item(type_="dish", item=answer)
             return answer
 
     async def get_dishes(self, submenu_id: str) -> list[dict]:
         """Gets a dish list"""
-        menu_accessor = MenuAccessor(self.session)
-        dishes = await menu_accessor.get_dishes(submenu_id=submenu_id)
-
-        return [await self.make_dish_answer(dish) for dish in dishes]
+        cached_dishes = await self.cache_accessor.get_list("dishes")
+        if cached_dishes:
+            return cached_dishes
+        dishes = await self.accessor.get_dishes(submenu_id=submenu_id)
+        dishes_list = [await self.make_dish_answer(dish) for dish in dishes]
+        await self.cache_accessor.set_list("dishes", dishes_list)
+        return dishes_list
 
     async def update_dish(self, dish_id: str, new_data: DishUpdate) -> dict | None:
         """Updates a dish for a given id."""
-        menu_accessor = MenuAccessor(self.session)
-        dish = await menu_accessor.update_dish(
+        dish = await self.accessor.update_dish(
             dish_id=dish_id, title=new_data.title,
             description=new_data.description, price=new_data.price,
         )
 
         if dish:
             answer = await self.make_dish_answer(dish)
+            await self.cache_accessor.set_item(type_="dish", item=answer)
+            await self.cache_accessor.delete_list("dishes")
             return answer
 
     @staticmethod
@@ -172,5 +212,8 @@ class MenuService(ServiceMixin):
 
 async def get_menu_service(
         session: AsyncSession = Depends(get_session),
+        cache: AbstractCache = Depends(get_cache),
 ) -> MenuService:
-    return MenuService(session=session)
+    accessor = MenuAccessor(session)
+    cache_accessor = MenuCacheAccessor(cache)
+    return MenuService(accessor=accessor, cache_accessor=cache_accessor)

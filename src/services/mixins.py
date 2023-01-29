@@ -1,6 +1,7 @@
-from sqlalchemy.ext.asyncio import AsyncSession
+from src.accessors import MenuAccessor, MenuCacheAccessor
 
 
 class ServiceMixin:
-    def __init__(self, session: AsyncSession):
-        self.session = session
+    def __init__(self, accessor: MenuAccessor, cache_accessor: MenuCacheAccessor):
+        self.accessor = accessor
+        self.cache_accessor = cache_accessor
