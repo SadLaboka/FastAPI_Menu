@@ -1,4 +1,4 @@
-[![My Skills](https://skillicons.dev/icons?i=py,fastapi,postgres,docker,github)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=py,fastapi,postgres,redis,docker,github)](https://skillicons.dev)
 
 # FastAPI_Menu
 
@@ -32,6 +32,10 @@ DBPORT=5432
 DBUSER=postgres
 DBPASSWORD=postgres
 DBNAME=postgres
+REDIS_HOST=localhost       # must be redis_cache for docker
+REDIS_PORT=6379
+REDIS_DB=0
+CACHE_EXPIRE_IN_SECONDS=600
 ```
 
 # Running tests:
