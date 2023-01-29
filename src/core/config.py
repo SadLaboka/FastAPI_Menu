@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Cache
 REDIS_HOST: str = os.getenv("REDIS_HOST", "redis-cache")
 REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
-REDIS_DB: int = int(os.getenv("REDIS_DB"), 0)
+REDIS_DB: int = int(os.getenv("REDIS_DB", 0))
 CACHE_EXPIRE_IN_SECONDS: int = int(os.getenv("CACHE_EXPIRE_IN_SECONDS", 600))
 
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
