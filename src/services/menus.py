@@ -214,6 +214,7 @@ async def get_menu_service(
         session: AsyncSession = Depends(get_session),
         cache: AbstractCache = Depends(get_cache),
 ) -> MenuService:
+    """Gets the menu-service instance for dependency injection."""
     accessor = MenuAccessor(session)
     cache_accessor = MenuCacheAccessor(cache)
     return MenuService(accessor=accessor, cache_accessor=cache_accessor)

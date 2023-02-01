@@ -55,4 +55,5 @@ cache: AbstractCache | None = None
 
 
 async def get_cache() -> AbstractCache:
+    """Gets the cache instance for dependency injection."""
     return RedisCache(cache)
