@@ -50,6 +50,17 @@ CACHE_EXPIRE_IN_SECONDS=600
 
 # REST API
 
+## Docs:
+1. OpenAPI:
+```
+/api/openapi
+```
+2. Redoc:
+```
+/api/redoc
+```
+
+
 ## Requests:
 
 | Description           | Method                                            | Request                                                                |
