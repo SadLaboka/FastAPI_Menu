@@ -67,6 +67,7 @@ CACHE_EXPIRE_IN_SECONDS=600
 |-----------------------|---------------------------------------------------|------------------------------------------------------------------------|
 | Get menu list         |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/`                                                       |
 | Create a menu         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/`                                                       |
+| Fill database         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/generate`                                               |
 | Get a specific menu   |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}`                                              |
 | Delete a menu         |![DELETE](https://img.shields.io/badge/-DELETE-red)| `/api/v1/menus/{menu_id}`                                              |
 | Update a menu         |![PATCH](https://img.shields.io/badge/-PATCH-9cf)  | `/api/v1/menus/{menu_id}`                                              |
