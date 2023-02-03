@@ -18,6 +18,7 @@ sqlalchemy = "^2.0.0"
 aioredis = "^2.0.1"
 aiofiles = "^22.1.0"
 types-aiofiles = "^22.1.0.6"
+openpyxl = "^3.1.0"
 
 
 [tool.poetry.group.dev.dependencies]

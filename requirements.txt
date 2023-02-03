@@ -48,6 +48,7 @@ mccabe==0.7.0
 more-itertools==8.14.0
 msgpack==1.0.4
 nodeenv==1.7.0
+openpyxl==3.1.0
 packaging==22.0
 parso==0.8.3
 pexpect==4.8.0
