@@ -2,7 +2,6 @@ import json
 
 
 class TestMenuRoutes:
-
     async def test_create_menu(self, client):
         menu_data = {
             "title": "Test menu",
@@ -75,7 +74,9 @@ class TestMenuRoutes:
 
     async def test_update_menu_404(self, client, menu_data):
         new_data = {"title": "Updated title", "description": "Updated description"}
-        resp = await client.patch(f"/api/v1/menus/{menu_data['id_']}", data=json.dumps(new_data))
+        resp = await client.patch(
+            f"/api/v1/menus/{menu_data['id_']}", data=json.dumps(new_data)
+        )
         resp_data = resp.json()
         assert resp.status_code == 404
         assert resp_data["detail"] == "menu not found"
@@ -83,7 +84,9 @@ class TestMenuRoutes:
     async def test_update_menu(self, client, menu_data, create_menu_in_database):
         new_data = {"title": "Updated title", "description": "Updated description"}
         await create_menu_in_database(**menu_data)
-        resp = await client.patch(f"/api/v1/menus/{menu_data['id_']}", data=json.dumps(new_data))
+        resp = await client.patch(
+            f"/api/v1/menus/{menu_data['id_']}", data=json.dumps(new_data)
+        )
         resp_data = resp.json()
         assert resp_data["id"] == menu_data["id_"]
         assert resp_data["title"] == new_data["title"]
@@ -107,7 +110,6 @@ class TestMenuRoutes:
 
 
 class TestSubMenuRoutes:
-
     async def test_create_submenu(
         self,
         client,
@@ -140,9 +142,13 @@ class TestSubMenuRoutes:
         resp_data = resp.json()
         assert resp_data["detail"] == "menu not found"
 
-    async def test_get_submenu_404(self, client, menu_data, submenu_data, create_menu_in_database):
+    async def test_get_submenu_404(
+        self, client, menu_data, submenu_data, create_menu_in_database
+    ):
         await create_menu_in_database(**menu_data)
-        resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}")
+        resp = await client.get(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}"
+        )
         resp_data = resp.json()
         assert resp.status_code == 404
         assert resp_data["detail"] == "submenu not found"
@@ -159,7 +165,9 @@ class TestSubMenuRoutes:
     ):
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
-        resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}")
+        resp = await client.get(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}"
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
         assert resp_data["id"] == submenu_data["id_"]
@@ -168,11 +176,15 @@ class TestSubMenuRoutes:
         assert resp_data["dishes_count"] == 0
 
         await create_dish_in_database(**dish_data)
-        resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}")
+        resp = await client.get(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}"
+        )
         resp_data = resp.json()
         assert resp_data["dishes_count"] == 1
 
-    async def test_get_submenu_list_empty(self, client, menu_data, create_menu_in_database):
+    async def test_get_submenu_list_empty(
+        self, client, menu_data, create_menu_in_database
+    ):
         await create_menu_in_database(**menu_data)
         resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus")
         assert resp.status_code == 200
@@ -199,7 +211,9 @@ class TestSubMenuRoutes:
         assert data["description"] == submenu_data["description"]
         assert data["dishes_count"] == 0
 
-    async def test_update_menu_404(self, client, menu_data, submenu_data, create_menu_in_database):
+    async def test_update_menu_404(
+        self, client, menu_data, submenu_data, create_menu_in_database
+    ):
         await create_menu_in_database(**menu_data)
         new_data = {"title": "Updated title", "description": "Updated description"}
         resp = await client.patch(
@@ -232,7 +246,9 @@ class TestSubMenuRoutes:
         assert resp_data["dishes_count"] == 0
 
     async def test_delete_dish_404(self, client, menu_data, submenu_data):
-        resp = await client.delete(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}")
+        resp = await client.delete(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}"
+        )
         resp_data = resp.json()
         assert resp.status_code == 404
         assert resp_data["detail"] == "submenu not found"
@@ -247,7 +263,9 @@ class TestSubMenuRoutes:
     ):
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
-        resp = await client.delete(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}")
+        resp = await client.delete(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}"
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
         assert resp_data["status"] is True
@@ -255,7 +273,6 @@ class TestSubMenuRoutes:
 
 
 class TestDishRoutes:
-
     async def test_create_dish(
         self,
         client,
@@ -342,7 +359,9 @@ class TestDishRoutes:
     ):
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
-        resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes")
+        resp = await client.get(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes"
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
         assert resp_data == []
@@ -361,7 +380,9 @@ class TestDishRoutes:
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
         await create_dish_in_database(**dish_data)
-        resp = await client.get(f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes")
+        resp = await client.get(
+            f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes"
+        )
         assert resp.status_code == 200
         resp_data = resp.json()
         assert isinstance(resp_data, list)
@@ -382,7 +403,11 @@ class TestDishRoutes:
     ):
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
-        new_data = {"title": "Updated title", "description": "Updated description", "price": 12.2}
+        new_data = {
+            "title": "Updated title",
+            "description": "Updated description",
+            "price": 12.2,
+        }
         resp = await client.patch(
             f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes/{dish_data['id_']}",
             data=json.dumps(new_data),
@@ -401,7 +426,11 @@ class TestDishRoutes:
         create_submenu_in_database,
         create_dish_in_database,
     ):
-        new_data = {"title": "Updated title", "description": "Updated description", "price": 12.2}
+        new_data = {
+            "title": "Updated title",
+            "description": "Updated description",
+            "price": 12.2,
+        }
         await create_menu_in_database(**menu_data)
         await create_submenu_in_database(**submenu_data)
         await create_dish_in_database(**dish_data)
@@ -445,7 +474,6 @@ class TestDishRoutes:
 
 
 class TestCascadeDelete:
-
     async def test_cascade_delete_dishes(
         self,
         client,
@@ -467,7 +495,7 @@ class TestCascadeDelete:
         )
         assert resp.status_code == 200
 
-        await delete_submenu_from_database(submenu_data['id_'])
+        await delete_submenu_from_database(submenu_data["id_"])
         await create_submenu_in_database(**submenu_data)
         resp = await client.get(
             f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}/dishes/{dish_data['id_']}",
@@ -492,7 +520,7 @@ class TestCascadeDelete:
         )
         assert resp.status_code == 200
 
-        await delete_menu_from_database(menu_data['id_'])
+        await delete_menu_from_database(menu_data["id_"])
         await create_menu_in_database(**menu_data)
         resp = await client.get(
             f"/api/v1/menus/{menu_data['id_']}/submenus/{submenu_data['id_']}",

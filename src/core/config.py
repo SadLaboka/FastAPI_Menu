@@ -15,8 +15,10 @@ POSTGRES_DB: str = os.getenv("DBNAME", "postgres")
 POSTGRES_USER: str = os.getenv("DBUSER", "postgres")
 POSTGRES_PASSWORD: str = os.getenv("DBPASSWORD", "postgres")
 
-DATABASE_URL: str = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}" \
-                    f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+DATABASE_URL: str = (
+    f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}"
+    f"@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+)
 # URL for tests
 TEST_DB_URL: str = os.getenv("TEST_DB_URL", "test-db")
 TEST_DATABASE_URL: str = f"postgresql+asyncpg://test:test@{TEST_DB_URL}:5432/test"

@@ -1,3 +1,4 @@
+aiofiles==22.1.0
 aioredis==2.0.1
 alembic==1.9.2
 anyio==3.6.2
@@ -89,6 +90,7 @@ tomli==2.0.1
 tomlkit==0.11.5
 traitlets==5.8.1
 trove-classifiers==2022.12.22
+types-aiofiles==22.1.0.6
 typing_extensions==4.4.0
 urllib3==1.26.12
 uvicorn==0.20.0

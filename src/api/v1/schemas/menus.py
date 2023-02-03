@@ -26,7 +26,7 @@ class DishBase(BaseModel):
         pattern = r"[+-]?([0-9]*[.])?[0-9]+"
 
         if not re.match(pattern, v):
-            raise ValueError('Uncorrect price')
+            raise ValueError("Uncorrect price")
         return v
 
 

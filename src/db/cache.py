@@ -15,10 +15,10 @@ class AbstractCache(ABC):
 
     @abstractmethod
     async def set(
-            self,
-            key: str,
-            value: bytes | str,
-            expire: int = config.CACHE_EXPIRE_IN_SECONDS,
+        self,
+        key: str,
+        value: bytes | str,
+        expire: int = config.CACHE_EXPIRE_IN_SECONDS,
     ):
         pass
 
@@ -33,19 +33,19 @@ class AbstractCache(ABC):
 
 class RedisCache(AbstractCache):
     async def get(self, key: str):
-        item = await self.cache.get(key)
+        item = await self.cache.get(key)  # type: ignore
         return item
 
     async def set(
-            self,
-            key: str,
-            value: bytes | str,
-            expire: int = config.CACHE_EXPIRE_IN_SECONDS,
+        self,
+        key: str,
+        value: bytes | str,
+        expire: int = config.CACHE_EXPIRE_IN_SECONDS,
     ):
-        await self.cache.set(name=key, value=value, ex=expire)
+        await self.cache.set(name=key, value=value, ex=expire)  # type: ignore
 
     async def remove(self, key: str):
-        await self.cache.delete(key)
+        await self.cache.delete(key)  # type: ignore
 
     async def close(self):
         await self.cache.close()

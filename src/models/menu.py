@@ -62,7 +62,8 @@ class SubMenuModel(db_base):
     description = Column(String(200), nullable=True, unique=False)
     menu_id = Column(
         UUID,
-        ForeignKey("menu.id", ondelete="CASCADE"), nullable=False,
+        ForeignKey("menu.id", ondelete="CASCADE"),
+        nullable=False,
     )
     menu = relationship("MenuModel", back_populates="submenus")
     dishes = relationship(
@@ -90,7 +91,8 @@ class DishModel(db_base):
     price = Column(Float(2), nullable=False)
     submenu_id = Column(
         UUID,
-        ForeignKey("submenu.id", ondelete="CASCADE"), nullable=False,
+        ForeignKey("submenu.id", ondelete="CASCADE"),
+        nullable=False,
     )
     submenu = relationship("SubMenuModel", back_populates="dishes")
 

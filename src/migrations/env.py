@@ -1,3 +1,4 @@
+from src.models import db_base
 import os
 from logging.config import fileConfig
 
@@ -17,7 +18,6 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from src.models import db_base
 target_metadata = db_base.metadata
 # target_metadata = None
 
@@ -29,6 +29,7 @@ target_metadata = db_base.metadata
 
 def get_url():
     from src.core import config
+
     test = os.getenv("TEST", None)
     if test:
         TEST_DB_URL = config.TEST_DB_URL
@@ -74,7 +75,7 @@ def run_migrations_online() -> None:
 
     """
     configuration = config.get_section(config.config_ini_section)
-    configuration['sqlalchemy.url'] = get_url()
+    configuration["sqlalchemy.url"] = get_url()
     connectable = engine_from_config(
         configuration,
         prefix="sqlalchemy.",
@@ -83,7 +84,8 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata,
+            connection=connection,
+            target_metadata=target_metadata,
         )
 
         with context.begin_transaction():

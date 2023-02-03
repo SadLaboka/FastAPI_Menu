@@ -1,5 +1,5 @@
 import asyncio
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 from typing import Any
 
 import asyncpg
@@ -16,15 +16,14 @@ from src.db.cache import AbstractCache, get_cache
 
 
 class TestCache(AbstractCache):
-
     async def get(self, key: str):
         return self.cache.get(key)
 
     async def set(
-            self,
-            key: str,
-            value: bytes | str,
-            expire: int = config.CACHE_EXPIRE_IN_SECONDS,
+        self,
+        key: str,
+        value: bytes | str,
+        expire: int = config.CACHE_EXPIRE_IN_SECONDS,
     ):
         self.cache[key] = value
 
@@ -41,7 +40,9 @@ class TestCache(AbstractCache):
 test_engine = create_async_engine(config.TEST_DATABASE_URL, future=True, echo=True)
 
 # create session for the interaction with database
-test_async_session = sessionmaker(test_engine, expire_on_commit=False, class_=AsyncSession)
+test_async_session = sessionmaker(
+    test_engine, expire_on_commit=False, class_=AsyncSession
+)
 
 CLEAN_TABLES = [
     "menu",
@@ -70,7 +71,9 @@ async def clean_tables(async_session_test):
     async with async_session_test() as session:
         async with session.begin():
             for table_for_cleaning in CLEAN_TABLES:
-                await session.execute(text(f"""TRUNCATE TABLE {table_for_cleaning} CASCADE;"""))
+                await session.execute(
+                    text(f"""TRUNCATE TABLE {table_for_cleaning} CASCADE;""")
+                )
 
 
 async def _get_test_db():
@@ -85,7 +88,7 @@ async def _get_test_cache():
 
 
 @pytest.fixture
-async def client() -> Generator[AsyncClient, Any, None]:
+async def client() -> AsyncGenerator[AsyncClient, Any]:
     """
     Create a new FastAPI TestClient that uses the `db_session` fixture to override
     the `get_db` dependency that is injected into routes.
@@ -98,7 +101,9 @@ async def client() -> Generator[AsyncClient, Any, None]:
 
 @pytest.fixture(scope="session")
 async def asyncpg_pool():
-    pool = await asyncpg.create_pool("".join(config.TEST_DATABASE_URL.split("+asyncpg")))
+    pool = await asyncpg.create_pool(
+        "".join(config.TEST_DATABASE_URL.split("+asyncpg"))
+    )
     yield pool
     await pool.close()
 
@@ -109,7 +114,9 @@ async def create_menu_in_database(asyncpg_pool):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
                 """INSERT INTO menu VALUES ($1, $2, $3)""",
-                id_, title, description,
+                id_,
+                title,
+                description,
             )
 
     return create_menu_in_database
@@ -117,11 +124,16 @@ async def create_menu_in_database(asyncpg_pool):
 
 @pytest.fixture
 async def create_submenu_in_database(asyncpg_pool):
-    async def create_submenu_in_database(id_: str, title: str, description: str, menu_id: str):
+    async def create_submenu_in_database(
+        id_: str, title: str, description: str, menu_id: str
+    ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
                 """INSERT INTO submenu VALUES ($1, $2, $3, $4)""",
-                id_, title, description, menu_id,
+                id_,
+                title,
+                description,
+                menu_id,
             )
 
     return create_submenu_in_database
@@ -129,11 +141,17 @@ async def create_submenu_in_database(asyncpg_pool):
 
 @pytest.fixture
 async def create_dish_in_database(asyncpg_pool):
-    async def create_dish_in_database(id_: str, title: str, description: str, price: float, submenu_id: str):
+    async def create_dish_in_database(
+        id_: str, title: str, description: str, price: float, submenu_id: str
+    ):
         async with asyncpg_pool.acquire() as connection:
             return await connection.execute(
                 """INSERT INTO dish VALUES ($1, $2, $3, $4, $5)""",
-                id_, title, description, price, submenu_id,
+                id_,
+                title,
+                description,
+                price,
+                submenu_id,
             )
 
     return create_dish_in_database
@@ -143,7 +161,9 @@ async def create_dish_in_database(asyncpg_pool):
 async def delete_submenu_from_database(asyncpg_pool):
     async def delete_submenu_from_database(id_: str):
         async with asyncpg_pool.acquire() as connection:
-            return await connection.execute("""DELETE FROM submenu WHERE id = $1;""", id_)
+            return await connection.execute(
+                """DELETE FROM submenu WHERE id = $1;""", id_
+            )
 
     return delete_submenu_from_database
 
