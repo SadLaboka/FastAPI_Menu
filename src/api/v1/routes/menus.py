@@ -29,6 +29,17 @@ async def menu_list(service: MenuService = Depends(get_menu_service)):
 
 
 @router.post(
+    path="/make-xl-file",
+    status_code=HTTPStatus.ACCEPTED,
+    summary="Download menu to excel spreadsheet",
+    tags=["menus"],
+)
+async def make_xl(service: MenuService = Depends(get_menu_service)):
+    task_id: str = await service.make_xl_file()
+    return {"status": True, "message": f"Task added. Task_id = {task_id}"}
+
+
+@router.post(
     path="/generate",
     status_code=HTTPStatus.OK,
     summary="Generate test menus and populate the database with them",

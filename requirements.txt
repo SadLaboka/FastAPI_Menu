@@ -8,6 +8,7 @@ asyncpg==0.27.0
 attrs==22.1.0
 backcall==0.2.0
 CacheControl==0.12.11
+celery==5.2.7
 certifi==2022.9.24
 cffi==1.15.1
 cfgv==3.3.1
@@ -48,7 +49,6 @@ mccabe==0.7.0
 more-itertools==8.14.0
 msgpack==1.0.4
 nodeenv==1.7.0
-openpyxl==3.1.0
 packaging==22.0
 parso==0.8.3
 pexpect==4.8.0

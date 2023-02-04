@@ -33,3 +33,10 @@ REDIS_DB: int = int(os.getenv("REDIS_DB", 0))
 CACHE_EXPIRE_IN_SECONDS: int = int(os.getenv("CACHE_EXPIRE_IN_SECONDS", 600))
 
 REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}"
+
+# RabbitMQ
+RABBITMQ_HOST: str = os.getenv("RABBITMQ_HOST", "localhost")
+RABBITMQ_USER: str = os.getenv("RABBITMQ_USER", "admin")
+RABBITMQ_PASS: str = os.getenv("RABBITMQ_PASS", "mypass")
+
+RABBITMQ_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:5672"

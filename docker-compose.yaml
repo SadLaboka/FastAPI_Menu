@@ -1,7 +1,11 @@
 version: "3.8"
+
+volumes:
+  celery-data:
+
 services:
   api:
-    container_name: FastAPI_Ylab
+    container_name: FastAPI_api
     build:
       context: .
       dockerfile: Dockerfile
@@ -16,10 +20,29 @@ services:
       - mynetwork
     ports:
       - "8000:8000"
+    volumes:
+      - celery-data:/usr/src/app/data
     depends_on:
       db:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  celery:
+    container_name: "celery"
+    build:
+      context: .
+      dockerfile: ./src/celery/Dockerfile
+    command: celery -A tasks worker --loglevel=INFO
+    env_file:
+      - .env
+    volumes:
+      - celery-data:/celery/data
+    networks:
+      - mynetwork
+    depends_on:
+      rabbitmq:
         condition: service_healthy
   db:
     container_name: "postgres-db"
@@ -56,6 +79,25 @@ services:
       interval: 5s
       timeout: 20s
       retries: 100
+  rabbitmq:
+    image: rabbitmq:3.11-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    env_file:
+      - .env
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER:-admin}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS:-mypass}
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    networks:
+      - mynetwork
+
 networks:
   mynetwork:
     driver: bridge

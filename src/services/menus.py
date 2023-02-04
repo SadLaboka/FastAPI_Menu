@@ -231,6 +231,14 @@ class MenuService(ServiceMixin):
         dishes = [dish for submenu in submenus for dish in submenu["dishes"]]
         await self.accessor.dish_multiple_create(dishes)
 
+    async def make_xl_file(self):
+        menus = await self.accessor.get_menus()
+        menus_data = json.dumps([menu.to_dict() for menu in menus])
+        result = self.celery_app.send_task(
+            "tasks.create_xlsx_file", kwargs={"data": menus_data}
+        )
+        return result.id
+
     @staticmethod
     async def make_dish_answer(dish: Dish) -> dict:
         """Converts an object to the desired format"""

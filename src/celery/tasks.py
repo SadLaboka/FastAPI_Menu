@@ -1,17 +1,28 @@
 import json
+import os
 import uuid
 
+from dotenv import load_dotenv
 from openpyxl import Workbook
-from openpyxl.styles import Font, PatternFill, Border, Side
+from openpyxl.styles import Border, Font, PatternFill, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
+from celery import Celery
 
-def create_xlsx_file():
-    with open("../data/menu.json", mode="r") as f:
-        content = f.read()
+load_dotenv()
+RABBITMQ_HOST: str = os.getenv("RABBITMQ_HOST", "localhost")
+RABBITMQ_USER: str = os.getenv("RABBITMQ_USER", "admin")
+RABBITMQ_PASS: str = os.getenv("RABBITMQ_PASS", "mypass")
 
+RABBITMQ_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:5672"
+
+app = Celery("tasks", broker=RABBITMQ_URL, backend="rpc://")
+
+
+@app.task()
+def create_xlsx_file(data: str):
+    menus = json.loads(data)
     id_ = uuid.uuid4()
-    menus = json.loads(content)
 
     wb = Workbook()
     wb.remove(wb.active)
@@ -44,7 +55,7 @@ def create_xlsx_file():
             row=row,
             font=font,
             fill=menu_fill,
-            border=border
+            border=border,
         )
 
         for sub_index, submenu in enumerate(menu["submenus"], start=1):
@@ -56,7 +67,7 @@ def create_xlsx_file():
                 row=row,
                 font=font,
                 fill=submenu_fill,
-                border=border
+                border=border,
             )
 
             for dish_index, dish in enumerate(submenu["dishes"], start=1):
@@ -68,26 +79,26 @@ def create_xlsx_file():
                     row=row,
                     font=font,
                     fill=dish_fill,
-                    border=border
+                    border=border,
                 )
 
-    wb.save(f"../data/{id_}.xlsx")
+    wb.save(f"data/{id_}.xlsx")
     wb.close()
 
 
 def construct_menu_cells(
-        sheet: Worksheet,
-        index: int,
-        menu: dict,
-        row: int,
-        font: Font,
-        fill: PatternFill,
-        border: Border
+    sheet: Worksheet,
+    index: int,
+    menu: dict,
+    row: int,
+    font: Font,
+    fill: PatternFill,
+    border: Border,
 ) -> None:
     menu_cells = [
         sheet.cell(row, 1, index),
         sheet.cell(row, 2, menu["title"]),
-        sheet.cell(row, 3, menu["description"])
+        sheet.cell(row, 3, menu["description"]),
     ]
     for cell in menu_cells:
         cell.font = font
@@ -97,18 +108,18 @@ def construct_menu_cells(
 
 
 def construct_submenu_cells(
-        sheet: Worksheet,
-        index: int,
-        submenu: dict,
-        row: int,
-        font: Font,
-        fill: PatternFill,
-        border: Border
+    sheet: Worksheet,
+    index: int,
+    submenu: dict,
+    row: int,
+    font: Font,
+    fill: PatternFill,
+    border: Border,
 ) -> None:
     submenu_cells = [
         sheet.cell(row, 2, index),
         sheet.cell(row, 3, submenu["title"]),
-        sheet.cell(row, 4, submenu["description"])
+        sheet.cell(row, 4, submenu["description"]),
     ]
     for cell in submenu_cells:
         cell.font = font
@@ -118,19 +129,19 @@ def construct_submenu_cells(
 
 
 def construct_dish_cells(
-        sheet: Worksheet,
-        index: int,
-        dish: dict,
-        row: int,
-        font: Font,
-        fill: PatternFill,
-        border: Border
+    sheet: Worksheet,
+    index: int,
+    dish: dict,
+    row: int,
+    font: Font,
+    fill: PatternFill,
+    border: Border,
 ) -> None:
     dish_cells = [
         sheet.cell(row, 3, index),
         sheet.cell(row, 4, dish["title"]),
         sheet.cell(row, 5, dish["description"]),
-        sheet.cell(row, 6, dish["price"])
+        sheet.cell(row, 6, dish["price"]),
     ]
     for cell in dish_cells:
         cell.font = font
