@@ -1,4 +1,4 @@
-[![My Skills](https://skillicons.dev/icons?i=py,fastapi,postgres,redis,docker,github)](https://skillicons.dev)
+[![My Skills](https://skillicons.dev/icons?i=py,fastapi,postgres,redis,rabbitmq,docker,github)](https://skillicons.dev)
 
 # FastAPI_Menu
 
