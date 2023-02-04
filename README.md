@@ -36,6 +36,9 @@ REDIS_HOST=localhost       # must be redis_cache for docker
 REDIS_PORT=6379
 REDIS_DB=0
 CACHE_EXPIRE_IN_SECONDS=600
+RABBITMQ_HOST=rabbitmq      # must be rabbitmq for docker
+RABBITMQ_USER=admin
+RABBITMQ_PASS=mypass
 ```
 
 # Running tests:
@@ -67,6 +70,9 @@ CACHE_EXPIRE_IN_SECONDS=600
 |-----------------------|---------------------------------------------------|------------------------------------------------------------------------|
 | Get menu list         |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/`                                                       |
 | Create a menu         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/`                                                       |
+| Create xlsx-file      |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/make-xl-file`                                           |
+| Get download-link     |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/get-xl-file/{task_id}`                                  |
+| Download xlsx-file    |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/download/{id}`                                          |
 | Fill database         |![POST](https://img.shields.io/badge/-POST-success)| `/api/v1/menus/generate`                                               |
 | Get a specific menu   |![GET](https://img.shields.io/badge/-GET-blue)     | `/api/v1/menus/{menu_id}`                                              |
 | Delete a menu         |![DELETE](https://img.shields.io/badge/-DELETE-red)| `/api/v1/menus/{menu_id}`                                              |
