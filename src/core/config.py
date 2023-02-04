@@ -7,6 +7,7 @@ load_dotenv()
 
 PROJECT_NAME: str = os.getenv("PROJECT_NAME", "FastAPI-Ylab")
 VERSION: str = "1.0.0"
+BASE_URL: str = "http://localhost:8000"
 
 # Postgres Settings
 POSTGRES_HOST: str = os.getenv("DBHOST", "localhost")
@@ -26,7 +27,7 @@ TEST_DATABASE_URL: str = f"postgresql+asyncpg://test:test@{TEST_DB_URL}:5432/tes
 # Project root
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Cache
+# Redis
 REDIS_HOST: str = os.getenv("REDIS_HOST", "redis-cache")
 REDIS_PORT: int = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB: int = int(os.getenv("REDIS_DB", 0))

@@ -4,6 +4,8 @@ import aiofiles  # type: ignore
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from celery import Celery
+from celery.result import AsyncResult
 from src.accessors import MenuAccessor, MenuCacheAccessor
 from src.api.v1.schemas import (
     DishCreate,
@@ -13,10 +15,13 @@ from src.api.v1.schemas import (
     SubMenuCreate,
     SubMenuUpdate,
 )
+from src.core import config
 from src.db import get_session
 from src.db.cache import AbstractCache, get_cache
 from src.models import Dish, Menu, SubMenu
 from src.services.mixins import ServiceMixin
+
+celery_app = Celery("tasks", broker=config.RABBITMQ_URL, backend="rpc://")
 
 
 class MenuService(ServiceMixin):
@@ -231,13 +236,20 @@ class MenuService(ServiceMixin):
         dishes = [dish for submenu in submenus for dish in submenu["dishes"]]
         await self.accessor.dish_multiple_create(dishes)
 
-    async def make_xl_file(self):
+    async def make_xl_file(self) -> str:
+        """Sets the task to create an Excel file"""
         menus = await self.accessor.get_menus()
         menus_data = json.dumps([menu.to_dict() for menu in menus])
-        result = self.celery_app.send_task(
+        result = celery_app.send_task(
             "tasks.create_xlsx_file", kwargs={"data": menus_data}
         )
         return result.id
+
+    @staticmethod
+    async def get_xl_file_status(task_id: str) -> AsyncResult:
+        """Gets status of task by id"""
+        result = celery_app.AsyncResult(id=task_id, app=celery_app)
+        return result
 
     @staticmethod
     async def make_dish_answer(dish: Dish) -> dict:

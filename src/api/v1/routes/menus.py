@@ -1,8 +1,10 @@
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
 from sqlalchemy.exc import IntegrityError
 
+from celery.result import AsyncResult
 from src.api.v1.schemas import MenuCreate, MenuResponse, MenuUpdate
 from src.api.v1.schemas.menus import (
     DishCreate,
@@ -12,6 +14,7 @@ from src.api.v1.schemas.menus import (
     SubMenuResponse,
     SubMenuUpdate,
 )
+from src.core.config import BASE_DIR, BASE_URL
 from src.services import MenuService, get_menu_service
 
 router = APIRouter()
@@ -37,6 +40,39 @@ async def menu_list(service: MenuService = Depends(get_menu_service)):
 async def make_xl(service: MenuService = Depends(get_menu_service)):
     task_id: str = await service.make_xl_file()
     return {"status": True, "message": f"Task added. Task_id = {task_id}"}
+
+
+@router.get(
+    path="/get-xl-file/{task_id}",
+    status_code=HTTPStatus.OK,
+    summary="Show status of file preparation and link to download",
+    tags=["menus"],
+)
+async def get_xl_status(task_id: str, service: MenuService = Depends(get_menu_service)):
+    result: AsyncResult = await service.get_xl_file_status(task_id)
+    if result.ready():
+        return {
+            "status": True,
+            "message": f"Link to download file: {BASE_URL}/api/v1/menus/download/{task_id}",
+        }
+    return {
+        "status": True,
+        "message": f"File not ready yet. Task state is {result.state}",
+    }
+
+
+@router.get(
+    path="/download/{filename}",
+    status_code=HTTPStatus.OK,
+    summary="Download file by filename",
+    tags=["menus"],
+)
+async def download_file(filename: str):
+    return FileResponse(
+        path=BASE_DIR.parent / f"data/{filename}.xlsx",
+        media_type="application/octet-stream",
+        filename="menu.xlsx",
+    )
 
 
 @router.post(

@@ -34,7 +34,7 @@ services:
     build:
       context: .
       dockerfile: ./src/celery/Dockerfile
-    command: celery -A tasks worker --loglevel=INFO
+    command: celery -A tasks worker --loglevel=INFO --pool=solo
     env_file:
       - .env
     volumes:

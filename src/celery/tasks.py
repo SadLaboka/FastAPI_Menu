@@ -1,6 +1,5 @@
 import json
 import os
-import uuid
 
 from dotenv import load_dotenv
 from openpyxl import Workbook
@@ -19,10 +18,11 @@ RABBITMQ_URL = f"amqp://{RABBITMQ_USER}:{RABBITMQ_PASS}@{RABBITMQ_HOST}:5672"
 app = Celery("tasks", broker=RABBITMQ_URL, backend="rpc://")
 
 
-@app.task()
+@app.task(track_started=True)
 def create_xlsx_file(data: str):
+    """Creates an Excel table with a menu based on json."""
     menus = json.loads(data)
-    id_ = uuid.uuid4()
+    id_ = app.current_task.request.id
 
     wb = Workbook()
     wb.remove(wb.active)
@@ -95,6 +95,7 @@ def construct_menu_cells(
     fill: PatternFill,
     border: Border,
 ) -> None:
+    """Fills menu cells with values and formats them."""
     menu_cells = [
         sheet.cell(row, 1, index),
         sheet.cell(row, 2, menu["title"]),
@@ -116,6 +117,7 @@ def construct_submenu_cells(
     fill: PatternFill,
     border: Border,
 ) -> None:
+    """Fills submenu cells with values and formats them."""
     submenu_cells = [
         sheet.cell(row, 2, index),
         sheet.cell(row, 3, submenu["title"]),
@@ -137,18 +139,15 @@ def construct_dish_cells(
     fill: PatternFill,
     border: Border,
 ) -> None:
+    """Fills dish cells with values and formats them."""
     dish_cells = [
         sheet.cell(row, 3, index),
         sheet.cell(row, 4, dish["title"]),
         sheet.cell(row, 5, dish["description"]),
-        sheet.cell(row, 6, dish["price"]),
+        sheet.cell(row, 6, f"{dish['price']:.2f}"),
     ]
     for cell in dish_cells:
         cell.font = font
         cell.fill = fill
         cell.border = border
     return None
-
-
-if __name__ == "__main__":
-    create_xlsx_file()
