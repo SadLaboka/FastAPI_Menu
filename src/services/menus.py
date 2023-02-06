@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from celery import Celery
 from celery.result import AsyncResult
+from dataclasses import asdict
 from src.accessors import MenuAccessor, MenuCacheAccessor
 from src.api.v1.schemas import (
     DishCreate,
@@ -19,12 +20,12 @@ from src.core import config
 from src.db import get_session
 from src.db.cache import AbstractCache, get_cache
 from src.models import Dish, Menu, SubMenu
-from src.services.mixins import ServiceMixin
+from src.services.base import ServiceBase
 
 celery_app = Celery("tasks", broker=config.RABBITMQ_URL, backend="rpc://")
 
 
-class MenuService(ServiceMixin):
+class MenuService(ServiceBase):
     async def create_menu(self, menu: MenuCreate) -> dict | None:
         """Creates a new menu."""
         new_menu = await self.accessor.create_menu(
@@ -239,7 +240,7 @@ class MenuService(ServiceMixin):
     async def make_xl_file(self) -> str:
         """Sets the task to create an Excel file"""
         menus = await self.accessor.get_menus()
-        menus_data = json.dumps([menu.to_dict() for menu in menus])
+        menus_data = json.dumps([asdict(menu) for menu in menus])
         result = celery_app.send_task(
             "tasks.create_xlsx_file", kwargs={"data": menus_data}
         )

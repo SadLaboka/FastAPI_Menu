@@ -82,7 +82,7 @@ def create_xlsx_file(data: str):
                     border=border,
                 )
 
-    wb.save(f"data/{id_}.xlsx")
+    wb.save(os.path.join("data", f"{id_}.xlsx"))
     wb.close()
 
 

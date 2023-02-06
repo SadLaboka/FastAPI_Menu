@@ -15,14 +15,6 @@ class Dish:
     description: str
     price: float
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "price": self.price,
-        }
-
 
 @dataclass
 class SubMenu:
@@ -31,14 +23,6 @@ class SubMenu:
     description: str
     dishes: list[Dish]
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "dishes": [dish.to_dict() for dish in self.dishes],
-        }
-
 
 @dataclass
 class Menu:
@@ -46,14 +30,6 @@ class Menu:
     title: str
     description: str
     submenus: list[SubMenu]
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "description": self.description,
-            "submenus": [submenu.to_dict() for submenu in self.submenus],
-        }
 
 
 class MenuModel(db_base):

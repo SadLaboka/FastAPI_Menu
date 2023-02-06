@@ -1,3 +1,4 @@
+import os
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -35,7 +36,7 @@ async def menu_list(service: MenuService = Depends(get_menu_service)):
     path="/make-xl-file",
     status_code=HTTPStatus.ACCEPTED,
     summary="Download menu to excel spreadsheet",
-    tags=["menus"],
+    tags=["Excel"],
 )
 async def make_xl(service: MenuService = Depends(get_menu_service)):
     task_id: str = await service.make_xl_file()
@@ -46,7 +47,7 @@ async def make_xl(service: MenuService = Depends(get_menu_service)):
     path="/get-xl-file/{task_id}",
     status_code=HTTPStatus.OK,
     summary="Show status of file preparation and link to download",
-    tags=["menus"],
+    tags=["Excel"],
 )
 async def get_xl_status(task_id: str, service: MenuService = Depends(get_menu_service)):
     result: AsyncResult = await service.get_xl_file_status(task_id)
@@ -65,13 +66,15 @@ async def get_xl_status(task_id: str, service: MenuService = Depends(get_menu_se
     path="/download/{filename}",
     status_code=HTTPStatus.OK,
     summary="Download file by filename",
-    tags=["menus"],
+    response_class=FileResponse,
+    tags=["Excel"],
 )
 async def download_file(filename: str):
+    headers = {"Content-Disposition": "attachment; filename=menu.xlsx"}
     return FileResponse(
-        path=BASE_DIR.parent / f"data/{filename}.xlsx",
-        media_type="application/octet-stream",
-        filename="menu.xlsx",
+        path=os.path.join(BASE_DIR.parent, "data", f"{filename}.xlsx"),
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        headers=headers
     )
 
 
@@ -79,7 +82,7 @@ async def download_file(filename: str):
     path="/generate",
     status_code=HTTPStatus.OK,
     summary="Generate test menus and populate the database with them",
-    tags=["menus"],
+    tags=["generate"],
 )
 async def generate_menu(service: MenuService = Depends(get_menu_service)):
     try:
@@ -161,7 +164,7 @@ async def menu_delete(
     path="/{menu_id}/submenus",
     summary="Get submenu list",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["submenus"],
 )
 async def submenu_list(
     menu_id: str,
@@ -176,7 +179,7 @@ async def submenu_list(
     response_model=SubMenuResponse,
     summary="Get a specific submenu",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["submenus"],
 )
 async def submenu_detail(
     submenu_id: str,
@@ -195,7 +198,7 @@ async def submenu_detail(
     response_model=SubMenuResponse,
     status_code=HTTPStatus.CREATED,
     summary="Create a submenu",
-    tags=["menus"],
+    tags=["submenus"],
 )
 async def submenu_create(
     menu_id: str,
@@ -215,7 +218,7 @@ async def submenu_create(
     response_model=SubMenuResponse,
     summary="Update a submenu",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["submenus"],
 )
 async def submenu_update(
     submenu_id: str,
@@ -236,7 +239,7 @@ async def submenu_update(
     path="/{menu_id}/submenus/{submenu_id}",
     summary="Delete a submenu",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["submenus"],
 )
 async def submenu_delete(
     menu_id: str,
@@ -255,7 +258,7 @@ async def submenu_delete(
     path="/{menu_id}/submenus/{submenu_id}/dishes",
     summary="Get dishes list",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["dishes"],
 )
 async def dish_list(
     submenu_id: str,
@@ -270,7 +273,7 @@ async def dish_list(
     response_model=DishResponse,
     summary="Get a specific dish",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["dishes"],
 )
 async def dish_detail(
     dish_id: str,
@@ -287,7 +290,7 @@ async def dish_detail(
     response_model=DishResponse,
     summary="Update a dish",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["dishes"],
 )
 async def dish_update(
     dish_id: str,
@@ -305,7 +308,7 @@ async def dish_update(
     response_model=DishResponse,
     status_code=HTTPStatus.CREATED,
     summary="Create a dish",
-    tags=["menus"],
+    tags=["dishes"],
 )
 async def dish_create(
     menu_id: str,
@@ -325,7 +328,7 @@ async def dish_create(
     path="/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}",
     summary="Delete a dish",
     status_code=HTTPStatus.OK,
-    tags=["menus"],
+    tags=["dishes"],
 )
 async def dish_delete(
     menu_id: str,
