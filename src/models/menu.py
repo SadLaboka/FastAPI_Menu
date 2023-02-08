@@ -45,12 +45,12 @@ class MenuModel(db_base):
         passive_deletes=True,
     )
 
-    def to_dc(self) -> Menu:
+    def to_dataclass(self) -> Menu:
         return Menu(
             id=str(self.id),
             title=self.title,
             description=self.description,
-            submenus=[s.to_dc() for s in self.submenus],
+            submenus=[s.to_dataclass() for s in self.submenus],
         )
 
 
@@ -73,12 +73,12 @@ class SubMenuModel(db_base):
         passive_deletes=True,
     )
 
-    def to_dc(self) -> SubMenu:
+    def to_dataclass(self) -> SubMenu:
         return SubMenu(
             id=str(self.id),
             title=self.title,
             description=self.description,
-            dishes=[d.to_dc() for d in self.dishes],
+            dishes=[d.to_dataclass() for d in self.dishes],
         )
 
 
@@ -96,7 +96,7 @@ class DishModel(db_base):
     )
     submenu = relationship("SubMenuModel", back_populates="dishes")
 
-    def to_dc(self) -> Dish:
+    def to_dataclass(self) -> Dish:
         return Dish(
             id=str(self.id),
             title=self.title,

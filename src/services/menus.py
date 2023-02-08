@@ -1,4 +1,5 @@
 import json
+from dataclasses import asdict
 
 import aiofiles  # type: ignore
 from fastapi import Depends
@@ -6,7 +7,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from celery import Celery
 from celery.result import AsyncResult
-from dataclasses import asdict
 from src.accessors import MenuAccessor, MenuCacheAccessor
 from src.api.v1.schemas import (
     DishCreate,

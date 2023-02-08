@@ -130,7 +130,7 @@ class MenuAccessor:
                         ),
                     )
                 ).first()
-        return menu.to_dc() if menu else None
+        return menu.to_dataclass() if menu else None
 
     async def get_menus(self) -> list[Menu]:
         """Gets a list of menus from the database."""
@@ -142,7 +142,7 @@ class MenuAccessor:
                     ),
                 )
 
-        return [menu.to_dc() for menu in menus.unique()]
+        return [menu.to_dataclass() for menu in menus.unique()]
 
     async def update_menu(self, id_: str, title: str, description: str) -> Menu | None:
         """Updates a menu entry in the database."""
@@ -186,7 +186,7 @@ class MenuAccessor:
                         .options(joinedload(SubMenuModel.dishes)),
                     )
                 ).first()
-        return submenu.to_dc() if submenu else None
+        return submenu.to_dataclass() if submenu else None
 
     async def get_submenus(self, menu_id: str) -> list[SubMenu]:
         """Gets a list of submenus from the database."""
@@ -198,7 +198,7 @@ class MenuAccessor:
                     .options(joinedload(SubMenuModel.dishes)),
                 )
 
-        return [submenu.to_dc() for submenu in submenus.unique()]
+        return [submenu.to_dataclass() for submenu in submenus.unique()]
 
     async def update_submenu(
         self, id_: str, title: str, description: str
@@ -250,7 +250,7 @@ class MenuAccessor:
                     self.session.add(dish)
                     await self.session.flush()
         finally:
-            return dish.to_dc() if dish.id else None
+            return dish.to_dataclass() if dish.id else None
 
     async def get_dish_by_id(self, dish_id: str) -> Dish | None:
         """Gets a dish entry from the database if it exists."""
@@ -261,7 +261,7 @@ class MenuAccessor:
                         select(DishModel).where(DishModel.id == dish_id),
                     )
                 ).first()
-        return dish.to_dc() if dish else None
+        return dish.to_dataclass() if dish else None
 
     async def get_dishes(self, submenu_id: str) -> list[Dish]:
         """Gets a list of dishes from the database."""
@@ -270,7 +270,7 @@ class MenuAccessor:
                 dishes = await self.session.scalars(
                     select(DishModel).where(DishModel.submenu_id == submenu_id),
                 )
-        return [dish.to_dc() for dish in dishes.unique()]
+        return [dish.to_dataclass() for dish in dishes.unique()]
 
     async def update_dish(
         self, dish_id: str, title: str, description: str, price: str

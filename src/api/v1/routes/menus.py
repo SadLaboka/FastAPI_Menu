@@ -74,7 +74,7 @@ async def download_file(filename: str):
     return FileResponse(
         path=os.path.join(BASE_DIR.parent, "data", f"{filename}.xlsx"),
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        headers=headers
+        headers=headers,
     )
 
 
